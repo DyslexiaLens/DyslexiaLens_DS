@@ -12,7 +12,7 @@
 # Disleksia adalah gangguan belajar yang memengaruhi kemampuan membaca dan menulis,
 # dialami oleh **5-17% anak usia sekolah** (International Dyslexia Association).
 # Deteksi dini sangat penting karena intervensi sebelum usia 8 tahun terbukti
-# meningkatkan kemampuan literasi hingga **70%** (Shaywitz, 2003).
+# meningkatkan kemamp` **70%** (Shaywitz, 2003).
 #
 # Namun, proses screening tradisional membutuhkan **psikolog terlatih**, **mahal**,
 # dan **tidak scalable** untuk daerah dengan keterbatasan tenaga ahli.
