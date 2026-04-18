@@ -1,171 +1,184 @@
-# DysRead Helper — Dataset Preparation & Preprocessing Pipeline
+# 🧠 DyslexiaLens — Data Science Repository
 
-## 📋 Overview
-
-Pipeline data untuk proyek DysRead Helper: early screening disleksia pada anak melalui 
-analisis citra tulisan tangan menggunakan pendekatan Vision-based (CNN).
-
-**Pendekatan:** Deteksi pola kognitif visual, BUKAN OCR.
-
-## 📁 Project Structure
-
-```
-dataset/
-├── raw/                          # Data mentah (belum diproses)
-│   ├── dyslexia_kaggle/         # Dyslexia Handwriting Dataset
-│   ├── iam_database/            # IAM Handwriting Database
-│   ├── az_handwritten/          # Kaggle A-Z Glyphs
-│   └── synthetic_generated/     # Output synthetic engine
-├── processed/                    # Data siap training
-│   ├── train/
-│   │   ├── dyslexic/
-│   │   └── non_dyslexic/
-│   ├── val/
-│   │   ├── dyslexic/
-│   │   └── non_dyslexic/
-│   └── test/
-│       ├── dyslexic/
-│       └── non_dyslexic/
-├── metadata/
-├── src/                         # Source code pipeline
-│   ├── preprocessing.py         # 7-step preprocessing pipeline
-│   ├── feature_extraction.py    # 12+ visual features for EDA
-│   ├── synthetic_generator.py   # Dyslexia pattern simulation
-│   ├── augmentation.py          # Label-safe augmentation
-│   ├── rebalancing.py           # Class balancing utilities
-│   ├── balanced_loader.py       # Balanced batch generators
-│   └── loss_functions.py        # Focal Loss & class weighting
-├── notebooks/                   # Jupyter notebooks (EDA, etc)
-├── reports/
-├── configs/
-│   └── preprocessing_config.yaml
-├── data_card.md                 # Dataset documentation
-├── requirements.txt
-└── README.md
-```
-
-## 🚀 Quick Start
-
-### ☁️ Google Colab (Recommended)
-
-Cara termudah — tidak perlu install apapun di komputer lokal:
-
-**Step 1:** Upload folder `src/` ke Google Drive (misal: `My Drive/DysRead/dataset/src/`)
-
-**Step 2:** Buat Colab notebook baru, paste cell ini:
-
-```python
-# Mount Drive
-from google.colab import drive
-drive.mount('/content/drive')
-
-# Install dependencies
-!pip install -q opencv-python-headless scikit-image scipy albumentations PyYAML tqdm
-
-# Set path ke project
-import sys
-sys.path.insert(0, '/content/drive/MyDrive/DysRead/dataset')
-
-# Test import
-from src.preprocessing import preprocess_for_cnn
-from src.feature_extraction import extract_all_features
-from src.synthetic_generator import DyslexiaSimulator
-from src.augmentation import get_augmentation_pipeline
-from src.loss_functions import FocalLoss, get_evaluation_metrics
-print("✅ All modules ready!")
-```
-
-**Step 3:** Gunakan modul seperti biasa (lihat contoh di bawah)
-
-> 📝 Lihat `colab_setup.py` untuk panduan lengkap cell-by-cell termasuk download dataset Kaggle dan training model.
+> Bagian Data Science dari Capstone Project **DyslexiaLens**: Intelligent Handwriting Detection and Assistance for Dyslexia.
+>
+> Repositori ini berisi seluruh proses kerja Data Scientist, mulai dari eksplorasi dan audit dataset, pembersihan data, pembuatan pipeline preprocessing, hingga dataset final yang siap digunakan oleh tim AI Engineer untuk proses pelatihan model.
 
 ---
 
-### 💻 Lokal
+## 📌 Tentang Proyek
 
-### 1. Install Dependencies
+**DyslexiaLens** adalah sistem *early screening* disleksia berbasis analisis citra tulisan tangan. Sistem ini **bukan alat diagnosis medis**, melainkan alat bantu skrining awal yang dapat digunakan oleh orang tua dan pendidik sebelum pemeriksaan lebih lanjut oleh profesional.
 
+| Detail | Keterangan |
+|---|---|
+| **Tema** | Accessible & Adaptive Learning |
+| **Peran Repositori Ini** | Data Science — Dataset Preparation & Analysis |
+| **Dataset Utama** | Gambo (Handwriting Dyslexia Dataset) |
+| **Total Sampel Awal** | 208.372 gambar `.png` |
+| **Total Sampel Bersih** | ~180.726 gambar (setelah drop kontaminasi label) |
+| **Format Output** | `master_dataset_dyslexia.csv` |
+
+---
+
+## 🗂️ Struktur Repositori
+
+```
+Dataset Disleksia/
+│
+├── 📓 Dyslexia.ipynb               # Notebook utama preprocessing & CSV generation
+├── 📊 master_dataset_dyslexia.csv  # Output dataset bersih (di-gitignore, generate lokal)
+├── 🔒 .gitignore
+│
+├── 📁 Gambo/                       # Dataset asli (di-gitignore, unduh terpisah)
+├── 📁 Gambo_Processed/             # Dataset hasil restrukturisasi awal (di-gitignore)
+│
+├── 📁 Python Stuff/                # Script Python helper
+│   ├── dataset_stats_script.py     # Menghitung statistik dataset
+│   ├── generate_csv.py             # Versi standalone dari CSV generator
+│   ├── preprocess_gambo.py         # Script restrukturisasi dataset fisik
+│   └── viz.py                      # Visualisasi sampel gambar di terminal
+│
+└── 📁 Dokumentasi/
+    ├── Rainy/                      # Dokumentasi Data Scientist (penulis repo)
+    |   ├── Checkpoint/             # Checkpoint Kerja
+    |   |   ├── Checkpoint1.md      # Checkpoint 1
+    │   ├── Analisis Dataset.md     # Laporan analisis & audit dataset lengkap
+    │   ├── Koreksi Disleksia.md    # Temuan severity score & skema pelabelan
+    │   ├── Penjelasan_Kelas_Dataset.md  # Penjelasan kelas & anomali visual
+    │   └── Pipeline_Preprocessing_Data.md  # Dokumentasi pipeline teknis
+    ├── Referensi/                  # Dokumen referensi tim
+    │   ├── Project Plan.md         # Rencana proyek & milestone
+    │   └── List Tugas.md           # Tech stack checklist (Main & Side Quest)
+    └── w0pal/                      # Dokumentasi anggota tim lain
+```
+
+---
+
+## 🔬 Alur Kerja Data Science
+
+### Tahap 1 — Eksplorasi & Audit Dataset
+Melakukan analisis mendalam pada dataset `Gambo` menggunakan script Python:
+- Menghitung distribusi gambar per kelas dan per split.
+- Memvalidasi konsistensi format file (resolusi, tipe warna, ekstensi).
+- Melakukan inspeksi visual manual pada sampel gambar.
+
+Temuan penting dapat dibaca di: [`Dokumentasi/Rainy/Analisis Dataset.md`](Dokumentasi/Rainy/Analisis%20Dataset.md)
+
+---
+
+### Tahap 2 — Data Auditing (Penemuan Kritis)
+Selama proses audit, ditemukan dua anomali kritis:
+
+**1. Sistem Severity Score (Temuan Utama)**
+Folder numerik (`1, 4, 5, 6, 7, 8, 9`) di dalam kelas `Corrected` dan `Reversal` **bukan** merujuk pada karakter angka, melainkan merepresentasikan **Tingkat Keparahan Goresan (Severity Score)**. Dengan skala asli yang terbalik: `1` = Paling Parah, `9` = Paling Ringan.
+
+**2. Kontaminasi Label (Label Noise)**
+Ditemukan file bernama `NormalXXXX.png` yang terselip di dalam folder `Corrected` dan `Reversal`, namun isinya secara visual adalah goresan yang sangat cacat — bukan tulisan normal.
+
+Detail selengkapnya: [`Dokumentasi/Rainy/Koreksi Disleksia.md`](Dokumentasi/Rainy/Koreksi%20Disleksia.md)
+
+---
+
+### Tahap 3 — Preprocessing & Normalisasi
+Dua pendekatan preprocessing diterapkan:
+
+**A. Physical Renaming (Opsional — Tahap 0 di Notebook)**
+Mengganti nama file secara fisik menggunakan *Dictionary Mapping* agar skala keparahan menjadi konsisten:
+
+| Skor Asli | → | Skor Baru | Keterangan |
+|---|---|---|---|
+| `9` | → | `1` | Paling Ringan |
+| `8` | → | `2` | |
+| `7` | → | `3` | |
+| `6` | → | `4` | |
+| `5` | → | `5` | |
+| `4` | → | `6` | Corrected Paling Parah |
+| `1` | → | `6` | Reversal (digabung ke puncak) |
+
+**B. Logical Cleaning via CSV (Wajib — Tahap 1 di Notebook)**
+Memfilter semua gambar kotor dan kontaminasi label langsung dari tabel `Pandas DataFrame` tanpa menghapus file fisik, menghasilkan `master_dataset_dyslexia.csv`.
+
+Detail teknis: [`Dokumentasi/Rainy/Pipeline_Preprocessing_Data.md`](Dokumentasi/Rainy/Pipeline_Preprocessing_Data.md)
+
+---
+
+### Tahap 4 — Output: Master Dataset CSV
+File `master_dataset_dyslexia.csv` adalah output final yang akan dikonsumsi oleh AI Engineer untuk proses training model CNN.
+
+| Kolom | Tipe | Deskripsi |
+|---|---|---|
+| `image_path` | String | Jalur lengkap lokasi file gambar |
+| `split` | String | `Train` atau `Test` |
+| `folder_category` | String | `Normal`, `Corrected`, atau `Reversal` |
+| `severity_score` | Integer (0–6) | Skor keparahan disleksia |
+| `target_class` | Integer (0/1) | Label biner: 0 = Normal, 1 = Disleksia |
+
+---
+
+## 🚀 Cara Menjalankan
+
+### Prasyarat
 ```bash
-pip install -r requirements.txt
+pip install pandas Pillow
 ```
 
-### 2. Preprocess Single Image
+### Langkah-langkah
+1. **Unduh dataset** `Gambo` dan letakkan di dalam folder root repositori ini.
+2. **Buka** `Dyslexia.ipynb` menggunakan Jupyter Notebook atau Google Colab.
+3. **Sesuaikan** variabel `root_dir` di setiap cell dengan path dataset Anda:
+   - Lokal: `r'Gambo'`
+   - Google Colab: `r'/content/drive/MyDrive/Gambo'`
+4. **Jalankan** cell secara berurutan:
+   - **Tahap 0** *(Opsional)*: Physical renaming file ke skala 1–6.
+   - **Tahap 1** *(Wajib)*: Generate `master_dataset_dyslexia.csv`.
 
-```bash
-python src/preprocessing.py path/to/image.png
-```
+> [!WARNING]
+> Jalankan **Tahap 0 hanya sekali**. Menjalankannya dua kali pada dataset yang sudah di-rename akan menyebabkan skala bergeser dan data menjadi kacau!
 
-### 3. Batch Preprocessing
+---
 
-```python
-from src.preprocessing import batch_preprocess
+## 📊 Statistik Dataset Final
 
-stats = batch_preprocess(
-    input_dir='raw/dyslexia_kaggle/',
-    output_dir='processed/train/dyslexic/',
-    target_size=(128, 128),
-    binarize_method='otsu'
-)
-```
+| Split | Normal | Corrected | Reversal | Total |
+|---|---|---|---|---|
+| Train | 39.334 | ~52.000* | ~40.000* | ~131.334 |
+| Test | 19.557 | ~16.000* | ~14.000* | ~49.557 |
+| **Total** | **58.891** | **~68.000*** | **~54.000*** | **~180.726** |
 
-### 4. Extract Features for EDA
+*\*Angka perkiraan setelah drop kontaminasi label.*
 
-```python
-from src.feature_extraction import extract_all_features
-import cv2
+---
 
-img = cv2.imread('image.png', cv2.IMREAD_GRAYSCALE)
-_, binary = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
-features = extract_all_features(binary)
-```
+## 📋 Checklist Progres Data Scientist
 
-### 5. Generate Synthetic Data
+- [x] Eksplorasi dan audit dataset `Gambo`
+- [x] Identifikasi Severity Score (folder 1-9)
+- [x] Deteksi kontaminasi label (`NormalXXXX.png`)
+- [x] Normalisasi skala severity (Dictionary Mapping → 0–6)
+- [x] Logical Cleaning via Pandas DataFrame
+- [x] Generate `master_dataset_dyslexia.csv`
+- [ ] Exploratory Data Analysis (EDA) lanjutan
+- [ ] Visualisasi distribusi kelas & skor
+- [ ] Dashboard Streamlit (EDA awal)
+- [ ] Dokumentasi Data Dictionary formal
+- [ ] Handover dataset ke AI Engineer
 
-```python
-from src.synthetic_generator import DyslexiaSimulator
+---
 
-sim = DyslexiaSimulator(reversal_prob=0.3, tremor_intensity=0.15)
-dyslexic_img = sim.generate_dyslexic_sample(normal_img)
-```
+## 👤 Kontributor
 
-### 6. Train with Balanced Loading
+| Nama | Role | Fokus |
+|---|---|---|
+| Rainy | Data Scientist | Dataset preparation, preprocessing, EDA |
+| w0pal | *(Anggota Tim)* | *(sesuai pembagian tugas)* |
 
-```python
-from src.balanced_loader import DirectoryBalancedGenerator
-from src.loss_functions import FocalLoss, get_evaluation_metrics
+---
 
-train_gen = DirectoryBalancedGenerator('processed/train/', batch_size=32)
-
-model.compile(
-    optimizer='adam',
-    loss=FocalLoss(gamma=2.0, alpha=0.75),
-    metrics=get_evaluation_metrics()
-)
-
-model.fit(train_gen, epochs=50)
-```
-
-## 📊 Pipeline Modules
-
-| Module | Purpose |
-|--------|---------|
-| `preprocessing.py` | Raw image → CNN-ready tensor (128×128×1) |
-| `feature_extraction.py` | 12+ quantitative visual features for EDA |
-| `synthetic_generator.py` | Simulate dyslexia patterns on normal handwriting |
-| `augmentation.py` | Label-safe + label-reinforcing augmentation |
-| `rebalancing.py` | Dataset rebalancing (targeted augmentation) |
-| `balanced_loader.py` | 50/50 balanced batch generators for Keras |
-| `loss_functions.py` | Focal Loss, Weighted BCE, evaluation metrics |
-
-## ⚠️ Important Notes
-
-1. **TIDAK menggunakan OCR** — Pendekatan ini mendeteksi pola visual, bukan membaca teks
-2. **Horizontal flip DILARANG** untuk kelas Normal — bisa mengubah label menjadi Reversal
-3. **Skeleton JANGAN digunakan sebagai CNN input** — hanya untuk feature extraction/EDA
-4. **Recall > Precision** — Untuk screening klinis, lebih baik false positive daripada false negative
-5. **Target Recall ≥ 0.90**
-
-## 📄 License
-
-Dataset ini menggunakan kombinasi sumber dengan lisensi berbeda. 
-Lihat `data_card.md` untuk detail per sumber.
+## 📄 Lisensi & Dataset
+Dataset `Gambo` adalah dataset publik. Harap perhatikan lisensi asli dataset sebelum mendistribusikan ulang.
+https://www.kaggle.com/datasets/drizasazanitaisa/dyslexia-handwriting-dataset
+1. M. S. A. B. Rosli, I. S. Isa, S. A. Ramlan, S. N. Sulaiman and M. I. F. Maruzuki, "Development of CNN Transfer Learning for Dyslexia Handwriting Recognition," 2021 11th IEEE International Conference on Control System, Computing and Engineering (ICCSCE), 2021, pp. 194-199, doi: 10.1109/ICCSCE52189.2021.9530971.
+2. N. S. L. Seman, I. S. Isa, S. A. Ramlan, W. Li-Chih and M. I. F. Maruzuki, "Notice of Removal: Classification of Handwriting Impairment Using CNN for Potential Dyslexia Symptom," 2021 11th IEEE International Conference on Control System, Computing and Engineering (ICCSCE), 2021, pp. 188-193, doi: 10.1109/ICCSCE52189.2021.9530989.
+3. Isa, Iza Sazanita. CNN Comparisons Models On Dyslexia Handwriting Classification / Iza Sazanita Isa … [et Al.]. Universiti Teknologi MARA Cawangan Pulau Pinang, 2021.
+4. Isa, I. S., Rahimi, W. N. S., Ramlan, S. A., & Sulaiman, S. N. (2019). Automated detection of dyslexia symptom based on handwriting image for primary school children. Procedia Computer Science, 163, 440-449.

@@ -1,3 +1,5 @@
 archive/*
 *.zip
 Gambo/
+Gambo_Processed/
+*.rar
