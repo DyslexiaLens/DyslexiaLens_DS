@@ -1,7 +1,7 @@
 # Checklist Data Scientist — DyslexiaLens
 
 > Dokumen ini adalah operasionalisasi tugas Data Scientist dari **Project Plan** dan **List Tugas (Tech Stack)** Capstone DyslexiaLens.
-> Status diperbarui per Checkpoint 2 (18 April 2026).
+> Status diperbarui per Checkpoint 3 (19 April 2026).
 >
 > **Simbol:** `[x]` = Selesai | `[~]` = Sedang dikerjakan | `[ ]` = Belum dikerjakan
 
@@ -59,24 +59,24 @@
 
 ### 4. Exploratory Data Analysis (EDA)
 
-- [~] Membuat visualisasi distribusi kelas (`Normal`, `Corrected`, `Reversal`) per split (Train/Test)
-- [~] Membuat visualisasi distribusi Severity Score (0–6) dalam bentuk bar chart
-- [~] Menampilkan sampel gambar representatif per kelas dan per skor keparahan
-- [~] Menganalisis potensi *class imbalance* antara kelas Normal vs Disleksia
-- [~] Menganalisis pola kesalahan tulisan:
-  - [~] Pola *letter reversal* (terutama pada kelas `Reversal`)
-  - [~] Tingkat *scribbling* berdasarkan Severity Score
+- [x] Membuat visualisasi distribusi kelas (`Normal`, `Corrected`, `Reversal`) per split (Train/Test)
+- [x] Membuat visualisasi distribusi Severity Score (0–6) dalam bentuk bar chart
+- [x] Menampilkan sampel gambar representatif per kelas dan per skor keparahan
+- [x] Menganalisis potensi *class imbalance* antara kelas Normal vs Disleksia
+- [x] Menganalisis pola kesalahan tulisan:
+  - [x] Pola *letter reversal* (terutama pada kelas `Reversal`)
+  - [x] Tingkat *scribbling* berdasarkan Severity Score
 - [x] Mendokumentasikan setiap temuan EDA awal (Temuan 1-3) dalam notebook dan file Markdown
 
 ---
 
 ### 5. Visualisasi Data & Explanatory Analysis
 
-- [ ] Membuat visualisasi yang menjawab pertanyaan bisnis:
-  - [ ] *"Apakah perbedaan distribusi visual antara kelas Normal dan Disleksia signifikan?"*
-  - [ ] *"Apakah Severity Score 6 secara visual jauh berbeda dari Severity Score 1?"*
-- [ ] Memastikan setiap grafik disertai narasi/insight dalam format Markdown
-- [ ] Menarik kesimpulan dari visualisasi yang mendukung hipotesis awal
+- [x] Membuat visualisasi yang menjawab pertanyaan bisnis:
+  - [x] *"Apakah perbedaan distribusi visual antara kelas Normal dan Disleksia signifikan?"* → Heatmap + sampel visual
+  - [x] *"Apakah Severity Score 6 secara visual jauh berbeda dari Severity Score 1?"* → Heatmap + sampel visual
+- [x] Memastikan setiap grafik disertai narasi/insight dalam format Markdown
+- [x] Menarik kesimpulan dari visualisasi yang mendukung hipotesis awal
 
 ---
 
@@ -84,16 +84,17 @@
 
 - [x] Memastikan dataset tidak mengandung informasi target di dalam fitur (*no data leakage*)
 - [x] Memastikan format output (`master_dataset_dyslexia.csv`) siap dibaca oleh pipeline model
-- [ ] Membuat **Data Dictionary** formal yang mendefinisikan setiap kolom CSV secara eksplisit
-- [ ] Memvalidasi split Train/Test yang sudah ada (73% Train / 27% Test)
-- [ ] Membuat split validasi tambahan dari data Train:
-  - [ ] Tentukan rasio: misalnya 80% Train → 64% Train aktual + 16% Validation
-  - [ ] Pastikan distribusi kelas seimbang di setiap split (stratified split)
-- [ ] Mendokumentasikan strategi augmentasi yang disarankan untuk AI Engineer:
-  - [ ] Rotasi kecil (±10°)
-  - [ ] Shear tipis
-  - [ ] **JANGAN** Horizontal Flip (akan merusak label Reversal)
-- [ ] Menyiapkan format handover dataset ke tim AI Engineer
+- [x] Membuat **Data Dictionary** formal yang mendefinisikan setiap kolom CSV secara eksplisit → Sel 6A
+- [x] Memvalidasi split Train/Test yang sudah ada → Sel 6B (proporsi + distribusi per split)
+- [x] Membuat split validasi tambahan dari data Train:
+  - [x] Rasio: 80% Train aktual + 20% Validation (stratified by severity_score)
+  - [x] Distribusi kelas seimbang di setiap split → Verified di sel 6D
+  - [x] Output: `master_dataset_final.csv` (Train/Validation/Test)
+- [x] Mendokumentasikan strategi augmentasi yang disarankan untuk AI Engineer:
+  - [x] Rotasi kecil (±10°) → Diimplementasikan di Tahap 5
+  - [x] Scaling (0.9×–1.1×) → Diimplementasikan di Tahap 5 (menggantikan shear)
+  - [x] **JANGAN** Horizontal Flip (akan merusak label Reversal) → Didokumentasikan
+- [x] Menyiapkan format handover dataset ke tim AI Engineer → `master_dataset_augmented.csv` + class weights
 
 ---
 
@@ -113,11 +114,12 @@
 - [x] `Koreksi Disleksia.md` — Temuan Severity Score dan skema pelabelan
 - [x] `Penjelasan_Kelas_Dataset.md` — Penjelasan kelas dan anomali visual
 - [x] `Pipeline_Preprocessing_Data.md` — Dokumentasi teknis pipeline (Update: Dual-Path Logic)
+- [x] `Temuan_EDA.md` — Dokumentasi lengkap temuan EDA + hasil augmentasi + class weights
 - [x] `README.md` (root) — Dokumentasi repositori utama
 - [x] `Checkpoint1.md` — Rekam jejak progres Checkpoint 1
 - [x] `Checkpoint2.md` — Rekam jejak progres Checkpoint 2
 - [x] `DATA_SCIENTIST_CHECKLIST.md` — *(file ini sendiri, terus disinkronkan)*
-- [~] Dokumentasi hasil EDA dalam format Markdown dengan narasi lengkap
+- [x] Dokumentasi hasil EDA dalam format Markdown dengan narasi lengkap
 
 ---
 

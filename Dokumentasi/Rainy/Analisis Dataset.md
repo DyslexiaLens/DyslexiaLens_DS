@@ -35,15 +35,17 @@ Struktur folder menggunakan hierarki standar `Split/Class` untuk PyTorch/Keras:
 * **Implikasi:** Setiap gambar adalah karakter tunggal yang terisolasi, bukan kata/kalimat.
 
 ## 4. Analisis Label & Kelas
-### Struktur Kelas Utama
+
+### 4.1 Struktur Kelas Utama
 | Kelas | Deskripsi |
 |---|---|
 | `Normal` | Tulisan tangan wajar, bebas dari ciri disleksia |
 | `Corrected` | Penulis menimpa/mencoret goresan yang salah tanpa menghapus. Menghasilkan goresan tumpang tindih parah |
 | `Reversal` | Penulis menulis karakter dengan arah terbalik (*mirror writing*) — gejala klasik disleksia |
 
-### Sistem Skoring Keparahan (Temuan Kunci)
+### 4.2 Sistem Skoring Keparahan (Temuan 1 — Kunci)
 Folder-folder numerik (`1, 4, 5, 6, 7, 8, 9`) di dalam `Corrected` dan `Reversal` merepresentasikan **derajat keparahan goresan (Severity Score)** — bukan identitas karakter. Setelah inspeksi visual dan normalisasi skala, sistem skor final setelah *preprocessing* adalah:
+
 | Skor (Setelah Normalisasi) | Makna |
 |---|---|
 | **0** | Normal — Tidak ada gejala disleksia |
@@ -54,23 +56,23 @@ Folder-folder numerik (`1, 4, 5, 6, 7, 8, 9`) di dalam `Corrected` dan `Reversal
 > [!IMPORTANT]
 > Skala asli dari periset (1=Parah, 9=Ringan) bersifat **terbalik secara tidak intuitif**. Tim pengembang telah melakukan normalisasi menggunakan *Dictionary Mapping* sehingga skala menjadi linear: **0 = Sehat hingga 6 = Paling Parah**.
 
+### 4.3 Kontaminasi Label / Label Noise (Temuan 2)
+Ditemukan file bernama `NormalXXXX.png` yang terselip di dalam folder `Corrected` dan `Reversal`. Secara visual, konten gambar tersebut adalah goresan cacat — bukan tulisan normal. Ini adalah *Label Noise* yang dibuang sebelum training melalui *Logical Cleaning*.
+
+### 4.4 Anomali Visual di Kelas Normal Asli (Temuan 3)
+Melalui inspeksi visual manual, ditemukan bahwa sejumlah sampel di dalam kelas `Normal` menampilkan goresan koreksi atau pola yang menyerupai karakteristik `Corrected`. Hal ini mengindikasikan **kontaminasi label dua arah** pada dataset asli:
+* File bergoresan cacat masuk ke folder Normal
+* Sebagian file di folder Normal memiliki goresan yang seharusnya masuk kategori Corrected
+
+> Temuan ini tercatat sebagai **risiko residual** dan menjadi dasar keputusan untuk menggunakan `master_dataset_dyslexia.csv` sebagai sumber kebenaran tunggal.
+
 ## 5. Penilaian Kualitas Data
 * **Kejelasan Gambar:** Resolusi 28x28 membatasi detail halus goresan, namun cukup untuk membedakan pola kelas secara kasar.
 * **Variasi:** Pencahayaan dan latar belakang telah dinormalisasi. Tidak ada variasi *background*.
 * **Konteks Klinis:** Gambar karakter terisolasi kehilangan konteks makro disleksia (spasi, *baseline*, margin). Dataset ini cocok sebagai *proxy screening* tingkat huruf, bukan kata.
-**⚠️ Temuan 2 — Kontaminasi Label (Label Noise) di Kelas Non-Normal**  
-Ditemukan file bernama `NormalXXXX.png` yang terselip di dalam folder `Corrected` dan `Reversal`. Secara visual, konten gambar tersebut adalah goresan cacat — bukan tulisan normal. Ini adalah *Label Noise* yang dibuang sebelum training.
-
-**⚠️ Temuan 3 — Anomali Visual di Kelas Normal Asli**
-Melalui inspeksi visual manual, ditemukan bahwa sejumlah sampel di dalam kelas `Normal` menampilkan goresan koreksi atau pola yang menyerupai karakteristik `Corrected`. Hal ini mengindikasikan kontaminasi label dua arah pada dataset asli.
-
-## 5. Penilaian Kualitas Data
-* **Kejelasan Gambar:** Resolusi 28x28 membatasi detail halus goresan.
-* **Variasi:** Pencahayaan dan latar belakang telah dinormalisasi.
-* **Konteks Klinis:** Gambar karakter terisolasi kehilangan konteks makro disleksia.
-* **Kontaminasi Label (*Label Noise*):** 
-    * File `NormalXXXX.png` terselip di folder non-Normal (Dimitigasi via *Logical Cleaning*).
-    * Anomali visual di kelas Normal asli (Tercatat sebagai risiko residual).
+* **Kontaminasi Label (*Label Noise*):**
+    * File `NormalXXXX.png` terselip di folder non-Normal → Dimitigasi via *Logical Cleaning*.
+    * Anomali visual di kelas Normal asli → Tercatat sebagai risiko residual.
 
 ## 6. Risiko yang Berhasil Dimitigasi
 | Risiko Awal | Status | Solusi |
@@ -78,6 +80,7 @@ Melalui inspeksi visual manual, ditemukan bahwa sejumlah sampel di dalam kelas `
 | *Data Leakage* (model belajar karakter, bukan goresan) | ✅ Gugur | Folder 1-9 merupakan *Severity Score*, bukan karakter |
 | *Label Noise* (`NormalXXXX.png` tersesat) | ✅ Dimitigasi | *Drop* via *Logical Cleaning* di Pandas CSV |
 | Skala skor terbalik (1=Parah dekat ke 0=Sehat) | ✅ Dikoreksi | *Dictionary Mapping* normalisasi ke skala 0–6 |
+| Anomali visual kelas Normal | ⚠️ Risiko Residual | Tercatat, CSV sebagai *ground truth* tunggal |
 | *Class Imbalance* Train vs Test | ⚠️ Perlu Pantau | Gunakan *weighted loss* atau *oversampling* saat training |
 
 ## 7. Keputusan Teknis Final (Actionable)
