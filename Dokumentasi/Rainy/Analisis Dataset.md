@@ -58,7 +58,19 @@ Folder-folder numerik (`1, 4, 5, 6, 7, 8, 9`) di dalam `Corrected` dan `Reversal
 * **Kejelasan Gambar:** Resolusi 28x28 membatasi detail halus goresan, namun cukup untuk membedakan pola kelas secara kasar.
 * **Variasi:** Pencahayaan dan latar belakang telah dinormalisasi. Tidak ada variasi *background*.
 * **Konteks Klinis:** Gambar karakter terisolasi kehilangan konteks makro disleksia (spasi, *baseline*, margin). Dataset ini cocok sebagai *proxy screening* tingkat huruf, bukan kata.
-* **Kontaminasi Label (*Label Noise*):** Ditemukan sejumlah file `NormalXXXX.png` yang terselip di dalam folder `Corrected` dan `Reversal` dengan konten visual yang justru berisi goresan cacat. File-file ini dibuang (*drop*) dari dataset bersih.
+**⚠️ Temuan 2 — Kontaminasi Label (Label Noise) di Kelas Non-Normal**  
+Ditemukan file bernama `NormalXXXX.png` yang terselip di dalam folder `Corrected` dan `Reversal`. Secara visual, konten gambar tersebut adalah goresan cacat — bukan tulisan normal. Ini adalah *Label Noise* yang dibuang sebelum training.
+
+**⚠️ Temuan 3 — Anomali Visual di Kelas Normal Asli**
+Melalui inspeksi visual manual, ditemukan bahwa sejumlah sampel di dalam kelas `Normal` menampilkan goresan koreksi atau pola yang menyerupai karakteristik `Corrected`. Hal ini mengindikasikan kontaminasi label dua arah pada dataset asli.
+
+## 5. Penilaian Kualitas Data
+* **Kejelasan Gambar:** Resolusi 28x28 membatasi detail halus goresan.
+* **Variasi:** Pencahayaan dan latar belakang telah dinormalisasi.
+* **Konteks Klinis:** Gambar karakter terisolasi kehilangan konteks makro disleksia.
+* **Kontaminasi Label (*Label Noise*):** 
+    * File `NormalXXXX.png` terselip di folder non-Normal (Dimitigasi via *Logical Cleaning*).
+    * Anomali visual di kelas Normal asli (Tercatat sebagai risiko residual).
 
 ## 6. Risiko yang Berhasil Dimitigasi
 | Risiko Awal | Status | Solusi |
@@ -70,8 +82,8 @@ Folder-folder numerik (`1, 4, 5, 6, 7, 8, 9`) di dalam `Corrected` dan `Reversal
 
 ## 7. Keputusan Teknis Final (Actionable)
 
-* **Preprocessing Fisik (Opsional):** Nama file diganti secara massal melalui script Python di `Dyslexia.ipynb` (Tahap 0). Tidak ada file yang dihapus, hanya diganti namanya agar skor konsisten (1–6).
-* **Preprocessing Logis (Wajib):** Filter data kotor via `Dyslexia.ipynb` (Tahap 1) menghasilkan `master_dataset_dyslexia.csv` berisi jalur gambar, `target_class` (0/1), dan `severity_score` (0–6). Model CNN hanya membaca CSV ini.
+* **Preprocessing Fisik (Opsional):** Nama file diganti secara massal melalui script Python di `Dyslexia.ipynb` (Tahap 2). Tidak ada file yang dihapus, hanya diganti namanya agar skor konsisten (1–6).
+* **Preprocessing Logis (Wajib):** Filter data kotor via `Dyslexia.ipynb` (Tahap 3) menghasilkan `master_dataset_dyslexia.csv`. Algoritma dirancang dengan *dual-path logic* untuk menangani dataset baik sebelum maupun sesudah *Physical Renaming*.
 * **Augmentasi yang Aman:** Rotasi kecil (-10° hingga 10°) dan *shear* tipis. **JANGAN gunakan Horizontal Flip** karena akan membalik 'd' menjadi 'b' dan merusak label.
 * **Tidak Perlu Merombak Struktur Folder Fisik:** Struktur `Train/Test/Kelas` bawaan dataset sudah memadai karena CSV sebagai *filter master* akan mengatur segalanya.
 

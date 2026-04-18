@@ -20,7 +20,7 @@ Model AI (CNN) **hanya akan membaca gambar yang terdaftar di CSV ini**. Gambar k
 ## 2. Preprocessing Fisik Opsional (Physical Renaming)
 Sebagai langkah tambahan opsional, nama file gambar fisik dapat diganti secara massal agar skala keparahannya konsisten dan langsung terbaca dari nama file.
 
-**Script:** Tersedia di `Dyslexia.ipynb` sebagai **Tahap 0**.
+**Script:** Tersedia di `Dyslexia.ipynb` sebagai **Tahap 2**.
 
 **Mekanisme:**
 * Menggunakan sistem *Dictionary Mapping* (bukan rumus matematika sederhana).
@@ -61,11 +61,19 @@ Hasil akhir dari *pipeline* ini memaksa model AI untuk mempelajari tiga paramete
 | `severity_score` | Integer (0–6) | Skor keparahan disleksia (0 = Sehat, 6 = Ekstrem) |
 | `target_class` | Integer (0/1) | Label biner: 0 = Normal, 1 = Ada gejala disleksia |
 
-## 5. Ringkasan Urutan Eksekusi
+## 5. Algoritma Pengambilan Skor (*Dual-Path Logic*)
+Untuk memastikan *reproducibility* baik di lingkungan lokal maupun *cloud* (Google Colab), fungsi `get_score` di Tahap 3 dirancang untuk menangani dua kondisi secara otomatis:
+1. **Lokal (Post-Stage 2):** Jika *Physical Renaming* sudah dijalankan, kode membaca skor 1-6 langsung dari nama file.
+2. **Cloud/Colab (Pre-Stage 2):** Jika *Physical Renaming* dilewati untuk menghemat I/O, kode otomatis menerapkan *Dictionary Mapping* dari skor asli periset ke skala AI 0-6.
+
+## 6. Ringkasan Urutan Eksekusi
 ```
-[Tahap 0]  Dyslexia.ipynb → Physical Renaming (Opsional)
-              ↓ Ganti nama file 1_xx.png → 6_xx.png dst.
-[Tahap 1]  Dyslexia.ipynb → Logical Cleaning & CSV Generation (Wajib)
-              ↓ Scan semua file → filter noise → simpan ke master_dataset_dyslexia.csv
-[Tahap 2]  Notebook Model CNN → Load CSV → Training → Evaluasi
+[Tahap 1] Assessing Data (Wajib)
+          ↓ Cek distribusi, integritas (sampling), dan anomali label.
+[Tahap 2] Physical Renaming (Opsional)
+          ↓ Ganti nama file fisik ke skala 1-6 (Dictionary Mapping).
+[Tahap 3] Cleaning Data & CSV Generation (Wajib)
+          ↓ Filter noise & normalisasi skor → master_dataset_dyslexia.csv
+[Tahap 4] Exploratory Data Analysis (EDA)
+          ↓ Analisis pola dan distribusi data bersih.
 ```
