@@ -1,0 +1,18 @@
+# Dependencies for Dyslexia.ipynb
+# ------------------------------
+
+# Core Data Science
+numpy
+pandas
+matplotlib
+seaborn
+
+# Image Processing
+Pillow
+
+# Machine Learning
+scikit-learn
+
+# Jupyter Environment (Optional but recommended)
+ipykernel
+notebook
