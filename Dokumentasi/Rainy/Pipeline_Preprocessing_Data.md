@@ -61,12 +61,19 @@ Hasil akhir dari *pipeline* ini memaksa model AI untuk mempelajari tiga paramete
 | `severity_score` | Integer (0–6) | Skor keparahan disleksia (0 = Sehat, 6 = Ekstrem) |
 | `target_class` | Integer (0/1) | Label biner: 0 = Normal, 1 = Ada gejala disleksia |
 
-## 5. Algoritma Pengambilan Skor (*Dual-Path Logic*)
+## 5. Strategi Keseimbangan Kelas Murni (*Pure Class Weighting*)
+Terdapat ketimpangan data antara Normal (58k) dan Disleksia (121k). Pipeline ini **menolak skema Data Augmentation fisik maupun Undersampling** karena berisiko merusak pola alami (*Overfitting*) dan membuang puluhan ribu data. 
+Sebagai gantinya, Data Scientist memproses sebuah matriks bobot (*Dictionary Mapping*) menggunakan pustaka Scikit-Learn.
+- Normal akan diberikan bobot penalti kekeliruan (Weight) sebesar: `1.55` (Skala Prioritas Tinggi)
+- Disleksia diberikan bobot: `0.75` (Skala Prioritas Normal)
+
+Mekanisme ini memungkinkan Neural Network menyesuaikan diri di level kalkulasi loss-function (*Algorithmic Level*) alih-alih di level manipulasi data (*Data Level*).
+
+## 6. Algoritma Pengambilan Skor (*Dual-Path Logic*)
 Untuk memastikan *reproducibility* baik di lingkungan lokal maupun *cloud* (Google Colab), fungsi `get_score` di Tahap 3 dirancang untuk menangani dua kondisi secara otomatis:
 1. **Lokal (Post-Stage 2):** Jika *Physical Renaming* sudah dijalankan, kode membaca skor 1-6 langsung dari nama file.
 2. **Cloud/Colab (Pre-Stage 2):** Jika *Physical Renaming* dilewati untuk menghemat I/O, kode otomatis menerapkan *Dictionary Mapping* dari skor asli periset ke skala AI 0-6.
 
-## 6. Ringkasan Urutan Eksekusi
 ```
 [Tahap 1] Assessing Data (Wajib)
           ↓ Cek distribusi, integritas (sampling), dan anomali label.
@@ -74,6 +81,10 @@ Untuk memastikan *reproducibility* baik di lingkungan lokal maupun *cloud* (Goog
           ↓ Ganti nama file fisik ke skala 1-6 (Dictionary Mapping).
 [Tahap 3] Cleaning Data & CSV Generation (Wajib)
           ↓ Filter noise & normalisasi skor → master_dataset_dyslexia.csv
-[Tahap 4] Exploratory Data Analysis (EDA)
+[Tahap 4] Exploratory Data Analysis & Explanatory
           ↓ Analisis pola dan distribusi data bersih.
+[Tahap 5] Stratified Validation Split & Class Weights 
+          ↓ Pembagian rasio akurat (Train/Val/Test) & Matriks Anti-Imbalance
+[Tahap Akhir] Handover ke AI Engineer
+          ↓ master_dataset_final.csv siap ditraining.
 ```

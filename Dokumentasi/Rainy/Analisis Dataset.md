@@ -81,14 +81,14 @@ Melalui inspeksi visual manual, ditemukan bahwa sejumlah sampel di dalam kelas `
 | *Label Noise* (`NormalXXXX.png` tersesat) | ✅ Dimitigasi | *Drop* via *Logical Cleaning* di Pandas CSV |
 | Skala skor terbalik (1=Parah dekat ke 0=Sehat) | ✅ Dikoreksi | *Dictionary Mapping* normalisasi ke skala 0–6 |
 | Anomali visual kelas Normal | ⚠️ Risiko Residual | Tercatat, CSV sebagai *ground truth* tunggal |
-| *Class Imbalance* Train vs Test | ⚠️ Perlu Pantau | Gunakan *weighted loss* atau *oversampling* saat training |
+| *Class Imbalance* Train vs Test | ⚠️ Perlu Pantau | Gunakan argumen `class_weight` murni saat training CNN |
 
 ## 7. Keputusan Teknis Final (Actionable)
 
 * **Preprocessing Fisik (Opsional):** Nama file diganti secara massal melalui script Python di `Dyslexia.ipynb` (Tahap 2). Tidak ada file yang dihapus, hanya diganti namanya agar skor konsisten (1–6).
 * **Preprocessing Logis (Wajib):** Filter data kotor via `Dyslexia.ipynb` (Tahap 3) menghasilkan `master_dataset_dyslexia.csv`. Algoritma dirancang dengan *dual-path logic* untuk menangani dataset baik sebelum maupun sesudah *Physical Renaming*.
-* **Augmentasi yang Aman:** Rotasi kecil (-10° hingga 10°) dan *shear* tipis. **JANGAN gunakan Horizontal Flip** karena akan membalik 'd' menjadi 'b' dan merusak label.
-* **Tidak Perlu Merombak Struktur Folder Fisik:** Struktur `Train/Test/Kelas` bawaan dataset sudah memadai karena CSV sebagai *filter master* akan mengatur segalanya.
+* **Augmentasi Fisik Dibatalkan:** Segala bentuk *Offline Augmentation* (rotasi, shear, zoom) dibatalkan untuk menghindari *overfitting* yang dipaksa dan *bloating* harddisk (dari 180.000 menjadi 300.000 file). Semuanya ditangani cukup via komputasi statistik `class_weight`.
+* **Tidak Perlu Merombak Struktur Folder Fisik:** Struktur `Train/Test/Kelas` bawaan dataset sudah memadai karena file murni `master_dataset_final.csv` sebagai *filter master* akan mengatur segalanya.
 
 ## 8. Wawasan Strategis
 

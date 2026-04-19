@@ -45,8 +45,8 @@ Rasio Train : Test ≈ **76% : 24%**
 ### Insight
 - Distribusi **sangat tidak merata** — skor 2–5 masing-masing hanya memiliki ~8K gambar, sementara skor 0, 1, dan 6 memiliki 42–59K.
 - Skor `6` tinggi karena menggabungkan dua skor asli periset (`1` untuk Reversal dan `4` untuk Corrected terparah).
-- Ketidakseimbangan ini akan menyebabkan model sangat lemah mengenali keparahan menengah jika tidak dimitigasi.
-- **Solusi:** Augmentasi fisik pada skor 2–5 (lihat Bagian 6).
+- Ketidakseimbangan ini mungkin dapat melemahkan model dalam mengenali keparahan menengah jika tidak ditangani.
+- **Solusi Final:** Kita BUKAN melakukan augmentasi fisik (*offline storage*), melainkan menggunakan kalkulasi **`class_weight`** untuk menghukum model secara matematis jika salah menebak kelas minoritas (lihat Bagian 7).
 
 ---
 
@@ -99,87 +99,59 @@ Perbandingan visual antara skor rendah (1), menengah (3), dan tinggi (6):
 
 ---
 
-## 6. Data Augmentation — Hasil Eksekusi (Tahap 5)
+## 6. Pembatalan Data Augmentation Fisik (Offline)
 
-### Strategi
-Augmentasi **hanya diterapkan pada skor 2–5 dari split Train** untuk menyeimbangkan distribusi severity score, menggunakan parameter sesuai Project Plan:
+### Strategi Ekseksusi Awal (DIBATALKAN)
+Awalnya, direncakan *offline data augmentation* (menyimpan gambar rotasi/zoom baru ke *disk*) pada skor 2–5 untuk menyeimbangkan distribusi severity score.
 
-| Teknik | Parameter |
-|---|---|
-| Rotasi searah jarum jam | +10° |
-| Rotasi berlawanan jarum jam | -10° |
-| Zoom in (scaling up) | 1.1× + crop center |
-| Zoom out (scaling down) | 0.9× + padding |
-| ❌ Horizontal Flip | **Tidak digunakan** (merusak label Reversal) |
+### Alasan Pembatalan (Keputusan Teknis):
+1. **Risiko Overfitting & Bloating:** Mengeksekusi augmentasi fisik pada dataset berjumlah dasar 180.000 gambar membuat total gambar menjadi hampir 300.000 file. Ini disebut *"Opsi Kurang Bijak"* karena akan membuat RAM hancur dan waktu *training* sangat lama.
+2. **Potensi Manipulasi Label:** Memutar gambar kelas Normal secara berlebihan berpotensi membuatnya jadi terlihat disleksia (misal huruf `b` jadi `d`).
+3. **Alternatif Jauh Lebih Baik:** Penyeimbangan distribusi sepenuhnya diserahkan kepada **AI Engineer** menggunakan fungsi `class_weight` saat _training_ model tanpa memodifikasi 1 file pun.
 
-### Hasil Eksekusi
-
-```
-🔄 Augmentasi Skor 2 (4 copy × 6.442 gambar) → 25.768 gambar
-🔄 Augmentasi Skor 3 (4 copy × 6.442 gambar) → 25.768 gambar
-🔄 Augmentasi Skor 4 (4 copy × 6.442 gambar) → 25.768 gambar
-🔄 Augmentasi Skor 5 (4 copy × 6.442 gambar) → 25.768 gambar
-
-Total augmented: 103.072 gambar | Error: 0
-```
-
-### Perbandingan Distribusi Severity Score (Train)
-
-| Severity Score | Sebelum | Sesudah | Perubahan |
-|---|---|---|---|
-| 0 (Normal) | 39.334 | 39.334 | Tidak diubah ✅ |
-| 1 (Ringan) | 33.324 | 33.324 | Tidak diubah ✅ |
-| 2 | 6.442 | 32.210 | ×5 ✅ |
-| 3 | 6.442 | 32.210 | ×5 ✅ |
-| 4 | 6.442 | 32.210 | ×5 ✅ |
-| 5 | 6.442 | 32.210 | ×5 ✅ |
-| 6 (Parah) | 38.584 | 38.584 | Tidak diubah ✅ |
-
-> **Alasan Normal TIDAK diaugmentasi:** Skor 0 sudah berada di ~39K — setara dengan skor tertinggi lainnya. Mengaugmentasinya justru akan menciptakan ketidakseimbangan baru di mana Normal menjadi kelas paling besar.
-
-### Output File
-- **Gambar augmented:** Tersimpan di folder `Gambo_Augmented/`
-- **CSV baru:** `master_dataset_augmented.csv` (283.798 baris = 180.726 original + 103.072 augmented)
+> **Keputusan Final:** Folder `Gambo_Augmented` dan file `master_dataset_augmented.csv` resmi dihapus/dibatalkan penggunaannya. Cukup gunakan dataset original di `master_dataset_final.csv`.
 
 ---
 
-## 7. Class Weights untuk AI Engineer
+## 7. Kalkulasi Class Weights (Strategi Wajib AI Engineer)
 
-Karena binary imbalance (Normal vs Disleksia) tidak dimitigasi via augmentasi, berikut bobot kelas yang dihitung menggunakan `sklearn.utils.class_weight.compute_class_weight('balanced')` dari data augmented Train:
+Karena binary imbalance (Normal vs Disleksia) dan severity imbalance tidak dimitigasi via perbanyakan gambar fisik, berikut bobot kelas yang dihitung menggunakan `sklearn.utils.class_weight.compute_class_weight` dari **Dataset Asli Original (180k baris)**:
 
 ### Binary (`target_class`)
 
-| Kelas | Label | Weight |
-|---|---|---|
-| 0 | Normal | **3,0518** |
-| 1 | Disleksia | **0,5980** |
+*Catatan: Kelas Disleksia (121k) jauh lebih banyak dari kelas Normal (58k).*
+
+| Kelas | Label | Weight | Deskripsi |
+|---|---|---|---|
+| 0 | Normal | **1.55** | Berikan penalti 1.55x lipat jika model salah menebak ini |
+| 1 | Disleksia | **0.75** | Berikan penalti standar 0.75x jika salah menebak |
 
 ### Severity (`severity_score`)
 
 | Skor | Weight |
 |---|---|
-| 0 | 0,8720 |
-| 1 | 1,0292 |
-| 2 | 1,0648 |
-| 3 | 1,0648 |
-| 4 | 1,0648 |
-| 5 | 1,0648 |
-| 6 | 0,8889 |
+| 0 (Normal) | **0.44** |
+| 1 (Ringan) | **0.60** |
+| 2 | **3.22** |
+| 3 | **3.22** |
+| 4 | **3.22** |
+| 5 | **3.22** |
+| 6 (Parah) | **0.55** |
 
-> **Cara penggunaan:** Masukkan dictionary weight ini sebagai parameter `class_weight` di `model.fit()` atau sebagai bobot di *loss function* custom.
+> **Cara penggunaan bagi AI Engineer:** Pilih akan menggunakan Binary atau Severity Target. Masukkan dictionary weight di atas sebagai parameter `class_weight` pada saat komputernya di _train_ ( `model.fit(..., class_weight=weights)` ).
 
 ---
 
-## 8. Ringkasan Temuan EDA
+## 8. Ringkasan Temuan EDA Final
 
-| # | Pertanyaan | Temuan |
-|---|---|---|
-| EDA-1 | Distribusi kelas konsisten antar split? | ✅ Ya — proporsi relatif Train dan Test serupa |
-| EDA-2 | Severity Score terdistribusi merata? | ⚠️ Tidak — skor 2–5 sangat kurang (dimitigasi via augmentasi) |
-| EDA-3 | Ada *class imbalance* binary? | ⚠️ Ya — rasio 1:2,07 (dimitigasi via `class_weight`) |
-| EDA-4 | Perbedaan visual antar kelas jelas? | ✅ Ya — Normal bersih, Corrected bertumpuk, Reversal terbalik |
-| EDA-5 | Perbedaan visual antar severity jelas? | ✅ Ya — skor rendah masih terbaca, skor tinggi destruktif |
-| EDA-6 | Pola Corrected vs Reversal berbeda? | ✅ Ya — distribusi severity dan jenis distorsi berbeda |
+| # | Pertanyaan | Temuan | Tindak Lanjut Terkini |
+|---|---|---|---|
+| EDA-1 | Distribusi kelas konsisten antar split? | ✅ Ya — proporsi relatif Train dan Test serupa | - |
+| EDA-2 | Severity Score terdistribusi merata? | ⚠️ Tidak — skor 2–5 sangat kurang | Ditangani dengan Severity `class_weight` |
+| EDA-3 | Ada *class imbalance* binary? | ⚠️ Ya — rasio 1:2,07 | Ditangani dengan Binary `class_weight` |
+| EDA-4 | Perbedaan visual antar kelas jelas? | ✅ Ya — Normal bersih, Corrected bertumpuk, Reversal terbalik | Melanjutkan ke CNN Modeling |
+| EDA-5 | Perbedaan visual antar severity jelas? | ✅ Ya — skor rendah masih terbaca, skor tinggi destruktif | Skor ini sangat layak jadi patokan level parah |
+| EDA-6 | Pola Corrected vs Reversal berbeda? | ✅ Ya — jenis distorsi berbeda secara mendrag | - |
 
 ### Kesimpulan Utama
-Dataset ini **layak** digunakan untuk klasifikasi biner (Normal vs Disleksia) maupun multi-class severity. Ketidakseimbangan severity telah dimitigasi via augmentasi fisik, dan ketidakseimbangan binary ditangani via `class_weight`. Strategi mitigasi berlapis ini memastikan model tidak bias terhadap kelas mayoritas.
+Dataset "harta karun" berjumlah 180.726 baris ini **100% LAYAK** digunakan tanpa perlu menghapus sebuah datapun (*Undersampling*) dan tanpa menduplikasi data manapun (*Augmentasi Spesifik/Offline*). Seluruh ketidakseimbangan diretas dengan sangat cemerlang dengan mengandalkan matematis **`class_weight`** di layer CNN!

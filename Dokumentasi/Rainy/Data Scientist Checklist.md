@@ -90,11 +90,12 @@
   - [x] Rasio: 80% Train aktual + 20% Validation (stratified by severity_score)
   - [x] Distribusi kelas seimbang di setiap split → Verified di sel 6D
   - [x] Output: `master_dataset_final.csv` (Train/Validation/Test)
-- [x] Mendokumentasikan strategi augmentasi yang disarankan untuk AI Engineer:
-  - [x] Rotasi kecil (±10°) → Diimplementasikan di Tahap 5
-  - [x] Scaling (0.9×–1.1×) → Diimplementasikan di Tahap 5 (menggantikan shear)
-  - [x] **JANGAN** Horizontal Flip (akan merusak label Reversal) → Didokumentasikan
-- [x] Menyiapkan format handover dataset ke tim AI Engineer → `master_dataset_augmented.csv` + class weights
+- [x] Membatalkan eksperimen Augmentasi Fisik (*Offline Storage*) karena masalah ledakan ukuran data (*Bloating* & *Overfitting*).
+- [x] Mewajibkan AI Engineer untuk murni menggunakan **`class_weight`** via parameter algoritma:
+  - [x] Melampirkan nilai weight untuk Binary Target (Normal=1.55, Disleksia=0.75).
+  - [x] Mendokumentasikan rasio severity weight untuk menangani skor minor.
+- [x] Menyiapkan format handover dataset riil ke tim AI Engineer → `master_dataset_final.csv` (180.726 gambar murni tanpa penipuan fisik).
+- [x] Menyusun sistem integrasi translasi dengan "Deterministic Smart Grid" (Baca dokumen: `todo.md`).
 
 ---
 
@@ -139,11 +140,11 @@
 ### Ke AI Engineer
 | Kebutuhan AI Engineer | Tanggung Jawab DS | Status |
 |---|---|---|
-| File dataset bersih siap training | `master_dataset_dyslexia.csv` | ✅ Selesai |
+| File dataset bersih siap training | `master_dataset_final.csv` (180.726 rows) | ✅ Selesai |
 | Kolom `image_path`, `target_class`, `severity_score` | Sudah ada di CSV | ✅ Selesai |
-| Strategi augmentasi yang aman | Dokumentasi di Pipeline_Preprocessing_Data.md | ✅ Selesai |
-| Split train/validation/test yang jelas | Stratified split dari CSV | ⏳ Belum dikerjakan |
-| Data Dictionary formal | Belum dibuat | ⏳ Belum dikerjakan |
+| Strategi mitigasi class imbalance yang aman | Parameter `class_weight` disediakan di Temuan_EDA.md | ✅ Selesai |
+| Split train/validation/test yang jelas | Stratified split pada `master_dataset_final.csv` | ✅ Selesai |
+| Data Dictionary formal | Tersedia di Notebook tahap Validasi Akhir | ✅ Selesai |
 
 ### Ke Full-Stack Developer / Backend
 | Kebutuhan Backend | Tanggung Jawab DS | Status |
