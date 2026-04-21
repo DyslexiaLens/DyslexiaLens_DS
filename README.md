@@ -17,7 +17,7 @@
 | **Dataset Utama** | Gambo (Handwriting Dyslexia Dataset) |
 | **Total Sampel Awal** | 208.372 gambar `.png` |
 | **Total Sampel Bersih** | ~180.726 gambar (setelah drop kontaminasi label) |
-| **Format Output** | `master_dataset_dyslexia.csv` |
+| **Format Output Final** | `master_dataset_final.csv` (Train, Val, Test) |
 
 ---
 
@@ -27,30 +27,33 @@
 Dataset Disleksia/
 │
 ├── 📓 Dyslexia.ipynb               # Notebook utama preprocessing & CSV generation
-├── 📊 master_dataset_dyslexia.csv  # Output dataset bersih (di-gitignore, generate lokal)
+├── 📊 master_dataset_final.csv     # Output dataset siap training (di-gitignore)
 ├── 🔒 .gitignore
 │
 ├── 📁 Gambo/                       # Dataset asli (di-gitignore, unduh terpisah)
-├── 📁 Gambo_Processed/             # Dataset hasil restrukturisasi awal (di-gitignore)
 │
 ├── 📁 Python Stuff/                # Script Python helper
-│   ├── dataset_stats_script.py     # Menghitung statistik dataset
-│   ├── generate_csv.py             # Versi standalone dari CSV generator
-│   ├── preprocess_gambo.py         # Script restrukturisasi dataset fisik
-│   └── viz.py                      # Visualisasi sampel gambar di terminal
+│   ├── dataset_stats_script.py     
+│   ├── generate_csv.py             
+│   ├── preprocess_gambo.py         
+│   └── viz.py                      
 │
 └── 📁 Dokumentasi/
     ├── Rainy/                      # Dokumentasi Data Scientist (penulis repo)
-    |   ├── Checkpoint/             # Checkpoint Kerja
-    |   |   ├── Checkpoint1.md      # Checkpoint 1
-    │   ├── Analisis Dataset.md     # Laporan analisis & audit dataset lengkap
-    │   ├── Koreksi Disleksia.md    # Temuan severity score & skema pelabelan
-    │   ├── Penjelasan_Kelas_Dataset.md  # Penjelasan kelas & anomali visual
-    │   └── Pipeline_Preprocessing_Data.md  # Dokumentasi pipeline teknis
-    ├── Referensi/                  # Dokumen referensi tim
-    │   ├── Project Plan.md         # Rencana proyek & milestone
-    │   └── List Tugas.md           # Tech stack checklist (Main & Side Quest)
-    └── w0pal/                      # Dokumentasi anggota tim lain
+    |   ├── Checkpoint/             
+    |   |   ├── Checkpoint3.md      # Rekap progres terkini
+    |   ├── Pembahasan Pembagian Dataset / Todo/
+    |   |   ├── Diskusi_Binary_vs_Severity.md
+    |   |   ├── Rangkuman_Opsi_Dataset_Training.md
+    |   |   └── todo.md             # Rencana Sistem Translasi OCR 
+    │   ├── Analisis Dataset.md     
+    │   ├── Data Scientist Checklist.md
+    │   ├── Koreksi Disleksia.md    
+    │   ├── Penjelasan_Kelas_Dataset.md  
+    │   ├── Pipeline_Preprocessing_Data.md  
+    │   ├── Explanatory_Analysis.md 
+    │   └── Temuan_EDA.md           # Parameter class_weight AI Engineer
+    └── Referensi/                  # Dokumen referensi tim
 ```
 
 ---
@@ -83,36 +86,30 @@ Detail selengkapnya: [`Dokumentasi/Rainy/Koreksi Disleksia.md`](Dokumentasi/Rain
 ### Tahap 3 — Preprocessing & Normalisasi
 Dua pendekatan preprocessing diterapkan:
 
-**A. Physical Renaming (Opsional — Tahap 0 di Notebook)**
-Mengganti nama file secara fisik menggunakan *Dictionary Mapping* agar skala keparahan menjadi konsisten:
+**A. Physical Renaming (Tahap 2 Notebook)**
+Mengkoreksi nama file menjadi skala keparahan numerik 1-6 agar linear (1=Ringan, 6=Terparah).
+*Catatan: Digabungnya Reversal (1) dan Corrected Terparah (4) membentuk puncak skor di 6.*
 
-| Skor Asli | → | Skor Baru | Keterangan |
-|---|---|---|---|
-| `9` | → | `1` | Paling Ringan |
-| `8` | → | `2` | |
-| `7` | → | `3` | |
-| `6` | → | `4` | |
-| `5` | → | `5` | |
-| `4` | → | `6` | Corrected Paling Parah |
-| `1` | → | `6` | Reversal (digabung ke puncak) |
+**B. Logical Cleaning via CSV (Tahap 3 Notebook)**
+Membuang gambar cacat label (`NormalXXXX.png`) dari metadata tanpa merusak file Windows aslinya.
 
-**B. Logical Cleaning via CSV (Wajib — Tahap 1 di Notebook)**
-Memfilter semua gambar kotor dan kontaminasi label langsung dari tabel `Pandas DataFrame` tanpa menghapus file fisik, menghasilkan `master_dataset_dyslexia.csv`.
-
-Detail teknis: [`Dokumentasi/Rainy/Pipeline_Preprocessing_Data.md`](Dokumentasi/Rainy/Pipeline_Preprocessing_Data.md)
+**C. Stratified Validation Split & Class Weights (Tahap 5 Notebook)**
+* Dataset dipecah menjadi **Train (60.6%), Validation (15.2%), Test (24.2%)** tanpa *Data Leakage*.
+* **Augmentasi Offline Dibatalkan** agar dataset tetap alami (180.726).
+* Ketidakseimbangan data ditangani murni menggunakan nilai **`class_weight`** yang dikalkulasi menggunakan Scikit-Learn.
 
 ---
 
-### Tahap 4 — Output: Master Dataset CSV
-File `master_dataset_dyslexia.csv` adalah output final yang akan dikonsumsi oleh AI Engineer untuk proses training model CNN.
+### Tahap 4 — Output: Final Dataset & Handover
+File `master_dataset_final.csv` adalah output akhir *pipeline* yang akan di-training oleh ***AI Engineer***.
 
-| Kolom | Tipe | Deskripsi |
-|---|---|---|
-| `image_path` | String | Jalur lengkap lokasi file gambar |
-| `split` | String | `Train` atau `Test` |
-| `folder_category` | String | `Normal`, `Corrected`, atau `Reversal` |
-| `severity_score` | Integer (0–6) | Skor keparahan disleksia |
-| `target_class` | Integer (0/1) | Label biner: 0 = Normal, 1 = Disleksia |
+| Kolom | Deskripsi |
+|---|---|
+| `image_path` | Jalur absolut lokasi file gambar |
+| `split` | `Train`, `Validation`, atau `Test` |
+| `folder_category` | Kategori sumber: `Normal`, `Corrected`, `Reversal` |
+| `severity_score` | Skor keparahan disleksia regresif (0 Sehat — 6 Ekstrem) |
+| `target_class` | Target KLASIFIKASI BINER (0 Normal vs 1 Disleksia) |
 
 ---
 
@@ -153,17 +150,18 @@ pip install pandas Pillow
 ## 📋 Checklist Progres Data Scientist
 
 - [x] Eksplorasi dan audit dataset `Gambo`
-- [x] Identifikasi Severity Score (folder 1-9)
+- [x] Identifikasi Severity Score & Skala Asli
 - [x] Deteksi kontaminasi label (`NormalXXXX.png`)
-- [x] Normalisasi skala severity (Dictionary Mapping → 0–6)
 - [x] Logical Cleaning via Pandas DataFrame
+- [x] Normalisasi skala severity (Dictionary Mapping → 0–6)
 - [x] Generate `master_dataset_dyslexia.csv`
-- [ ] Exploratory Data Analysis (EDA) lanjutan
-- [ ] Visualisasi distribusi kelas & skor
-- [ ] Dashboard Streamlit (EDA awal)
-- [ ] Dokumentasi Data Dictionary formal
-- [ ] Handover dataset ke AI Engineer
+- [x] Exploratory Data Analysis & Explanatory Analysis Visual
+- [x] Stratified Split Dataset (Train, Val, Test) tanpa *Leakage*
+- [x] Kalkulasi Parameter `class_weight` Murni (Zero Data Loss)
+- [x] Dokumentasi Data Dictionary & Strategy Blueprint
+- [x] Handover Endpoint CSV: `master_dataset_final.csv`
 
+Status keseluruhan dapat dilihat di file `Data Scientist Checklist.md`.
 ---
 
 ## 👤 Kontributor
