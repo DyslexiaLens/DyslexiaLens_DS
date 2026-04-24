@@ -5,7 +5,7 @@ import numpy as np
 import shutil
 
 def process_images():
-    base_dir = r"d:\Tugas\Kuliah\Semester 6\Dicoding\Capstone Project\Dataset Disleksia\Dataset"
+    base_dir = r"/var/home/homepc/Documents/dataset"
     source_dir = os.path.join(base_dir, "Gambo")
     target_dir = os.path.join(base_dir, "Gambo_Standardized")
     

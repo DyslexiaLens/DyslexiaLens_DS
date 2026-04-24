@@ -1,12 +1,30 @@
+# Python & Environments
+__pycache__/
+*.pyc
+.venv/
+env/
+*env
+
+# Dataset Folders (Huge Physical Files)
 Dataset/
+Dataset_Ready/
+EMNIST_Processed/
+Gambo*/
+archive/
+processed/
+raw/
+reports/
+
+# Compressed Files & Artifacts (Upload these to GitHub Releases!)
 *.zip
 *.rar
 *.7z
-*.csv
-archive/
+# Ignore all .gz files EXCEPT the test dataset for Streamlit
+*.gz
+!dyslexialens_test.csv.gz
+
+# IDE & OS Files
+.vscode/
+.idea/
+.DS_Store
 prompt/
-*env
-processed/
-Gambo_dataset/
-*.7z
-EMNIST_Processed/

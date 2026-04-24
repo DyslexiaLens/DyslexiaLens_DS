@@ -1,5 +1,5 @@
-# Dependencies for Dyslexia.ipynb
-# ------------------------------
+# Dependencies for Dyslexia Dataset Project
+# ----------------------------------------
 
 # Core Data Science
 numpy
@@ -9,9 +9,16 @@ seaborn
 
 # Image Processing
 Pillow
+opencv-python
 
-# Machine Learning
+# Dashboard & UI
+streamlit
+
+# Machine Learning & Baseline
 scikit-learn
+
+# Deep Learning (For AI Engineer)
+tensorflow
 
 # Jupyter Environment (Optional but recommended)
 ipykernel
