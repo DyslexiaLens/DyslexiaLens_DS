@@ -94,45 +94,8 @@ with tab2:
     st.write("Apakah pola goresan tulisan tangan dapat digunakan sebagai indikator tingkat keparahan disleksia?")
     
     if df_master is not None:
-        def compute_mean_image(subset):
-            images = []
-            for _, row in subset.iterrows():
-                path = row['image_path']
-                if os.path.exists(path):
-                    try:
-                        img = Image.open(path).convert('L').resize((28,28))
-                        images.append(np.array(img))
-                    except: pass
-            return np.mean(images, axis=0) if images else np.zeros((28,28))
-
-        st.markdown("#### 🔥 Heatmap Rata-rata Piksel: Skor 2 (Paling Ringan) vs Skor 6 (Parah)")
-        st.write("Visualisasi ini membuktikan secara matematis bahwa ada perbedaan ketebalan goresan (koreksi/reversal) antara penderita gejala ringan dan parah.")
-        
-        # Ambil sampel kecil untuk menghitung rata-rata agar web tidak lemot
-        subset_s2 = df_master[df_master['severity_score'] == 2].sample(min(1000, len(df_master[df_master['severity_score'] == 2])), random_state=42)
-        subset_s6 = df_master[df_master['severity_score'] == 6].sample(min(1000, len(df_master[df_master['severity_score'] == 6])), random_state=42)
-        
-        with st.spinner("Menghitung Heatmap secara live..."):
-            mean_s2 = compute_mean_image(subset_s2)
-            mean_s6 = compute_mean_image(subset_s6)
-            
-            fig, axes = plt.subplots(1, 3, figsize=(12, 4))
-            axes[0].imshow(mean_s2, cmap='gray')
-            axes[0].set_title('Rata-rata Skor 2 (Paling Ringan)', fontweight='bold')
-            axes[0].axis('off')
-            
-            axes[1].imshow(mean_s6, cmap='gray')
-            axes[1].set_title('Rata-rata Skor 6 (Parah)', fontweight='bold')
-            axes[1].axis('off')
-            
-            diff_img = np.abs(mean_s2 - mean_s6)
-            im = axes[2].imshow(diff_img, cmap='hot')
-            axes[2].set_title('Perbedaan (|Skor 2 - Skor 6|)', fontweight='bold')
-            axes[2].axis('off')
-            
-            st.pyplot(fig)
-            diff_sev = np.mean(diff_img)
-            st.success(f"**Rata-rata selisih intensitas piksel:** {diff_sev:.2f} (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
+        st.image('assets/heatmap_eda.png', use_container_width=True)
+        st.success("**Rata-rata selisih intensitas piksel:** ~5.20 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
 
 # ==========================================
 # TAB 3: DATA PREP & STRATIFICATION
