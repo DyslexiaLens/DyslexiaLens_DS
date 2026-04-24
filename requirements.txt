@@ -1,25 +1,11 @@
-# Dependencies for Dyslexia Dataset Project
-# ----------------------------------------
+# Dependencies for Streamlit Cloud (App Dashboard)
+# ------------------------------------------------
 
-# Core Data Science
+# Core Data Science & Image Processing
 numpy
 pandas
 matplotlib
-seaborn
-
-# Image Processing
 Pillow
-opencv-python
 
 # Dashboard & UI
 streamlit
-
-# Machine Learning & Baseline
-scikit-learn
-
-# Deep Learning (For AI Engineer)
-tensorflow
-
-# Jupyter Environment (Optional but recommended)
-ipykernel
-notebook

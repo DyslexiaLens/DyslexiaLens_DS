@@ -1,0 +1,22 @@
+# Dependencies for AI Engineer (Deep Learning & Scripts)
+# -----------------------------------------------------
+
+# Core Data Science
+numpy
+pandas
+matplotlib
+seaborn
+
+# Image Processing
+Pillow
+opencv-python
+
+# Machine Learning & Baseline
+scikit-learn
+
+# Deep Learning
+tensorflow
+
+# Jupyter Environment
+ipykernel
+notebook
