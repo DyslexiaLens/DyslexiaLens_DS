@@ -1,9 +1,12 @@
-archive/*
+Dataset/
 *.zip
-Gambo/
-Gambo_Processed/
-Gambo_Augmented/
 *.rar
+*.7z
+*.csv
+archive/
 prompt/
 *env
 processed/
+Gambo_dataset/
+*.7z
+EMNIST_Processed/
