@@ -81,7 +81,7 @@ with tab1:
             test_counts = df_master[df_master['split'] == 'Test']['target_class'].value_counts(normalize=True).rename({0: 'Normal', 1: 'Dyslexia'}) * 100
             
             comparison_df = pd.DataFrame({'Train (%)': train_counts, 'Test (%)': test_counts})
-            st.dataframe(comparison_df.style.format("{:.2f}%"), use_container_width=True)
+            st.dataframe(comparison_df.style.format("{:.2f}%"), width='stretch')
             st.info("💡 **Stratifikasi Berhasil!** Proporsi kelas Normal dan Dyslexia identik di set Train dan Test, mencegah adanya Domain Shift.")
     else:
         st.error("csv_metadata/master_dataset_dyslexia.csv tidak ditemukan!")
@@ -94,7 +94,7 @@ with tab2:
     st.write("Apakah pola goresan tulisan tangan dapat digunakan sebagai indikator tingkat keparahan disleksia?")
     
     if df_master is not None:
-        st.image('assets/heatmap_eda.png', use_container_width=True)
+        st.image('assets/heatmap_eda.png', width='stretch')
         st.success("**Rata-rata selisih intensitas piksel:** ~5.20 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
 
 # ==========================================
