@@ -94,6 +94,25 @@ with tab2:
     st.write("Apakah pola goresan tulisan tangan dapat digunakan sebagai indikator tingkat keparahan disleksia?")
     
     if df_master is not None:
+        st.markdown("#### 📊 Distribusi Kelas per Split")
+        st.image('assets/class_distribution.png', width='stretch')
+        st.divider()
+        
+        st.markdown("#### 📈 Distribusi Keparahan (Severity Score)")
+        st.image('assets/severity_distribution.png', width='stretch')
+        st.divider()
+        
+        st.markdown("#### 🖼️ Sampel Kelas: Normal vs Corrected vs Reversal")
+        st.write("Berikut adalah perbandingan wujud asli tulisan dari 3 kelas utama:")
+        st.image('assets/class_samples.png', width='stretch')
+        st.divider()
+
+        st.markdown("#### 🖼️ Sampel Visual Keparahan Tulisan")
+        st.write("Berikut adalah perbandingan wujud asli tulisan dari penderita gejala ringan (Skor 2) hingga parah (Skor 6):")
+        st.image('assets/severity_samples.png', width='stretch')
+        st.divider()
+        
+        st.markdown("#### 🔥 Heatmap Rata-rata Piksel: Skor 2 (Paling Ringan) vs Skor 6 (Parah)")
         st.image('assets/heatmap_eda.png', width='stretch')
         st.success("**Rata-rata selisih intensitas piksel:** ~5.20 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
 
