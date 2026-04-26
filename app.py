@@ -2,9 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 import os
-from PIL import Image
 
 # Konfigurasi Halaman (Harus dipanggil paling atas)
 st.set_page_config(page_title="DyslexiaLens - Data Viewer", page_icon="🧠", layout="wide")
@@ -37,16 +35,6 @@ def load_master_data():
 
 df_master = load_master_data()
 
-# Karena severity_score mungkin hilang saat overwrite CSV, kita reconstruct dari filename
-if df_master is not None and 'severity_score' not in df_master.columns:
-    def get_score(filename):
-        if '_' in str(filename):
-            prefix = str(filename).split('_')[0]
-            if prefix.isdigit():
-                return int(prefix)
-        return 0
-    df_master['severity_score'] = df_master['file_name'].apply(get_score)
-
 # ==========================================
 # TAB 1: DATASET SUMMARY
 # ==========================================
@@ -69,11 +57,12 @@ with tab1:
             st.markdown("#### Distribusi Kelas Keseluruhan")
             class_counts = df_master['target_class'].value_counts().rename({0: 'Normal (0)', 1: 'Dyslexia (1)'})
             fig, ax = plt.subplots(figsize=(6, 4))
-            colors = ['#E74C3C', '#2ECC71'] if 'Dyslexia' in class_counts.index[0] else ['#2ECC71', '#E74C3C']
+            colors = ['#E74C3C', '#2ECC71'] if 'Dyslexia' in str(class_counts.index[0]) else ['#2ECC71', '#E74C3C']
             class_counts.plot(kind='bar', color=colors, ax=ax)
             ax.set_ylabel("Jumlah Gambar")
             plt.xticks(rotation=0)
             st.pyplot(fig)
+            plt.close(fig)
             
         with col2:
             st.markdown("#### Proporsi Stratified (Train vs Test)")
@@ -93,9 +82,14 @@ with tab2:
     st.markdown("### 🎯 Pertanyaan Bisnis & EDA Heatmap")
     st.write("Apakah pola goresan tulisan tangan dapat digunakan sebagai indikator tingkat keparahan disleksia?")
     
-    if df_master is not None:
+    st.markdown("#### 🔥 Heatmap Rata-rata Piksel: Skor 2 (Paling Ringan) vs Skor 6 (Parah)")
+    st.write("Visualisasi ini membuktikan secara matematis bahwa ada perbedaan ketebalan goresan (koreksi/reversal) antara penderita gejala ringan dan parah.")
+    
+    if os.path.exists('assets/heatmap_eda.png'):
         st.image('assets/heatmap_eda.png', width='stretch')
         st.success("**Rata-rata selisih intensitas piksel:** ~5.20 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
+    else:
+        st.warning("⚠️ File `assets/heatmap_eda.png` tidak ditemukan. Pastikan file heatmap sudah tersedia di folder `assets/`.")
 
 # ==========================================
 # TAB 3: DATA PREP & STRATIFICATION
