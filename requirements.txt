@@ -8,4 +8,4 @@ matplotlib
 Pillow
 
 # Dashboard & UI
-streamlit
+streamlit>=1.45.0
