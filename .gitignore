@@ -20,8 +20,6 @@ reports/
 *.rar
 *.7z
 # Ignore all .gz files EXCEPT the test dataset for Streamlit
-*.gz
-!dyslexialens_test.csv.gz
 
 # IDE & OS Files
 .vscode/
