@@ -38,7 +38,7 @@ dataset_choice = st.sidebar.radio(
 if dataset_choice == "Dataset Dengan Augmentasi (Gambo + EMNIST)":
     csv_path = 'csv_metadata/master_dataset_dyslexia.csv'
 else:
-    csv_path = 'csv_metadata/Rainy/master_dataset_final.csv'
+    csv_path = 'csv_metadata/Rainy/Dataset_Dyslexia_NoAugmentation.csv'
 
 st.sidebar.info(f"**File Aktif:**\n`{csv_path}`")
 
