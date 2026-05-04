@@ -272,59 +272,62 @@ with tab4:
         subset = df_pixels[df_pixels['label'] == target_val]
         
         if len(subset) > 0:
-            st.write(f"Menampilkan 10 sampel gambar acak dari total **{len(subset):,}** gambar kelas ini:")
-            samples = subset.sample(min(10, len(subset)))
-            
-            cols = st.columns(5)
-            for i, (_, row) in enumerate(samples.iterrows()):
-                pixels = row.values[1:].reshape(28, 28)
-                fig, ax = plt.subplots(figsize=(2,2))
-                try:
-                    ax.imshow(pixels, cmap='gray', vmin=0, vmax=255)
-                    ax.axis('off')
-                    cols[i % 5].pyplot(fig)
-                finally:
-                    plt.close(fig)
+            try:
+                st.write(f"Menampilkan 10 sampel gambar acak dari total **{len(subset):,}** gambar kelas ini:")
+                samples = subset.sample(min(10, len(subset)))
                 
-            st.divider()
-            st.markdown("#### 📈 Analisis Piksel Interaktif")
-            
-            col_chart1, col_chart2 = st.columns(2)
-            
-            # Idea 4: Average Image
-            with col_chart1:
-                st.write("**Rata-Rata Goresan (Ghost Image)**")
-                n_samples = min(500, len(subset))
+                cols = st.columns(5)
+                for i, (_, row) in enumerate(samples.iterrows()):
+                    pixels = row.drop('label').values.astype(np.float64).reshape(28, 28)
+                    fig, ax = plt.subplots(figsize=(2,2))
+                    try:
+                        ax.imshow(pixels, cmap='gray', vmin=0, vmax=255)
+                        ax.axis('off')
+                        cols[i % 5].pyplot(fig)
+                    finally:
+                        plt.close(fig)
+                    
+                st.divider()
+                st.markdown("#### 📈 Analisis Piksel Interaktif")
+                
+                n_samples = min(300, len(subset))
                 avg_sample = subset.sample(n_samples, random_state=42)
-                pixel_data = avg_sample.iloc[:, 1:].values
+                pixel_data = avg_sample.drop(columns=['label']).values.astype(np.float64)
                 avg_image = np.mean(pixel_data, axis=0).reshape(28, 28)
                 
-                fig, ax = plt.subplots(figsize=(4, 4))
-                try:
-                    ax.imshow(avg_image, cmap='gray', vmin=0, vmax=255)
-                    ax.axis('off')
-                    ax.set_title(f"Pola Rata-rata dari {n_samples} sampel acak")
-                    st.pyplot(fig)
-                finally:
-                    plt.close(fig)
+                col_chart1, col_chart2 = st.columns(2)
                 
-            # Idea 3: Histogram
-            with col_chart2:
-                st.write("**Distribusi Ketebalan Tinta (Intensitas Piksel)**")
-                flat_pixels = pixel_data.flatten()
-                stroke_pixels = flat_pixels[flat_pixels > 10]
+                with col_chart1:
+                    st.write("**Rata-Rata Goresan (Ghost Image)**")
+                    fig, ax = plt.subplots(figsize=(4, 4))
+                    try:
+                        ax.imshow(avg_image, cmap='gray', vmin=0, vmax=255)
+                        ax.axis('off')
+                        ax.set_title(f"Pola Rata-rata dari {n_samples} sampel acak")
+                        st.pyplot(fig)
+                    finally:
+                        plt.close(fig)
+                    
+                with col_chart2:
+                    st.write("**Distribusi Ketebalan Tinta (Intensitas Piksel)**")
+                    flat_pixels = pixel_data.flatten()
+                    stroke_pixels = flat_pixels[flat_pixels > 10]
+                    
+                    fig, ax = plt.subplots(figsize=(5, 4))
+                    try:
+                        ax.hist(stroke_pixels, bins=30, color='#34495E', alpha=0.7)
+                        ax.set_title("Distribusi Intensitas Piksel Goresan (>10)")
+                        ax.set_xlabel("Intensitas (0-255)")
+                        ax.set_ylabel("Frekuensi")
+                        st.pyplot(fig)
+                    finally:
+                        plt.close(fig)
+                    
+                    mean_intensity = np.mean(stroke_pixels) if len(stroke_pixels) > 0 else 0
+                    st.caption(f"Rata-rata intensitas goresan untuk {n_samples} sampel ini: **{mean_intensity:.1f}**")
                 
-                fig, ax = plt.subplots(figsize=(5, 4))
-                try:
-                    ax.hist(stroke_pixels, bins=30, color='#34495E', alpha=0.7)
-                    ax.set_title("Distribusi Intensitas Piksel Goresan (>10)")
-                    ax.set_xlabel("Intensitas (0-255)")
-                    ax.set_ylabel("Frekuensi")
-                    st.pyplot(fig)
-                finally:
-                    plt.close(fig)
-                
-                mean_intensity = np.mean(stroke_pixels) if len(stroke_pixels) > 0 else 0
-                st.caption(f"Rata-rata intensitas goresan untuk {n_samples} sampel ini: **{mean_intensity:.1f}**")
+                del pixel_data, flat_pixels, stroke_pixels, avg_image
+            except Exception as e:
+                st.error(f"⚠️ Terjadi error saat memproses data: {e}")
         else:
             st.error("Tidak ada data untuk kelas ini.")
