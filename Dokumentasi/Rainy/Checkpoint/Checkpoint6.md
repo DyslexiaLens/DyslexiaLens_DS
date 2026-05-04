@@ -7,7 +7,7 @@
 ## 🎯 Ringkasan Eksekutif Sesi
 Sesi ini berfokus pada resolusi dari tantangan *Class Imbalance* yang membayangi dataset kita, sekaligus menjadi titik pembersihan kode-kode historis (legacy) yang kurang efisien. Kita resmi mengadopsi integrasi **Gambo + EMNIST ByClass** sebagai *Single Source of Truth* untuk dataset training yang diaugmentasi.
 
-Selain perombakan pipeline dataset, sesi ini juga menyembuhkan *Dashboard Streamlit* kita dari penyakit kronis berupa kebocoran memori (*Memory Leak*) yang sering menyebabkan aplikasi *crash* (Oh no. Error running app). Dengan perbaikan ini, dashboard serah terima (*Handover Dashboard*) kita kini kokoh, stabil, dan siap mendemonstrasikan analisis piksel secara *real-time*.
+Selain perombakan pipeline dataset, sesi ini juga menyembuhkan *Dashboard Streamlit* kita dari penyakit kronis berupa kebocoran memori (*Memory Leak*) yang terjadi dalam dua gelombang — crash saat pindah tab, dan crash saat memilih kelas Disleksia di Viewer. Keduanya telah ditangani hingga dashboard serah terima (*Handover Dashboard*) kini kokoh, stabil, dan siap mendemonstrasikan analisis piksel secara *real-time*.
 
 ---
 
@@ -22,7 +22,7 @@ Selain perombakan pipeline dataset, sesi ini juga menyembuhkan *Dashboard Stream
 
 ---
 
-## 2. Operasi Penyembuhan Dashboard Streamlit (Memory Leak Fix)
+## 2. Operasi Penyembuhan Dashboard Streamlit (Memory Leak Fix — Gelombang 1)
 **Konteks:** Dashboard eksplorasi `app.py` sering mengalami *Crash/Force Close* mendadak saat pengguna berpindah-pindah tab.
 
 **Diagnosa & Penanganan Akar Masalah:**
@@ -41,6 +41,29 @@ Untuk menjaga profesionalisme dan standar repositori *Data Science* yang bersih,
   - Rata-rata untuk dataset EMNIST adalah **~14.00**.
   - Angka ini memvalidasi hipotesis bisnis kita bahwa *"Tingkat keparahan (Severity) berbanding lurus dengan ketebalan goresan akibat perilaku mengulang/mencoreng (Reversal/Corrected)."*
 - **Eksplorasi Luring (Gzip):** File `csv_metadata/dyslexialens_test_EMNIST.csv.gz` terbaru (~23.1 MB) berhasil di- *generate*. File pipih ini memuat 94.671 matriks piksel *test set* yang menjadi tulang punggung dari fitur "Analisis Piksel Interaktif" di Dashboard Tab 4. Berkas ini juga telah dirapikan ke dalam folder `csv_metadata`.
+
+---
+
+## 4. Operasi Penyembuhan Dashboard Streamlit (Crash Fix — Gelombang 2)
+**Konteks:** Setelah perbaikan Gelombang 1 berhasil menghilangkan crash saat pindah tab, ditemukan bahwa **Tab 4 (Viewer Compressed CSV)** masih crash secara konsisten ketika pengguna mengganti filter kelas dari *"Normal (0)"* ke *"Dyslexia (1)"*. Kelas Normal tetap berfungsi normal, tetapi kelas Disleksia selalu memicu *"Oh no. Error running app."* — baik pada dataset `noAugmentation` maupun `EMNIST`.
+
+**Akar Masalah yang Ditemukan:**
+1. **Positional Slicing Fragile (`row.values[1:]`):** Kode lama mengambil piksel dari setiap baris menggunakan *slicing* posisi (`row.values[1:]`). Pendekatan ini rentan gagal jika urutan kolom DataFrame berubah saat Streamlit melakukan *rerun*, karena Streamlit tidak menjamin urutan kolom setelah *filtering* dan *sampling* berulang kali di sesi yang sama.
+   - **Solusi:** Diganti dengan `row.drop('label').values.astype(np.float64)` — secara eksplisit membuang kolom `label` berdasarkan nama (bukan posisi), lalu *cast* ke `float64` untuk menjamin konsistensi tipe data saat `.reshape(28, 28)`.
+
+2. **Memory Bloat pada Subset Besar:** Saat kelas Disleksia dipilih, subset bisa mencapai **37.166 baris** (EMNIST) atau **24.159 baris** (noAugmentation). Operasi `.sample(500)` → `.iloc[:, 1:].values` → `.flatten()` pada jumlah sebesar ini menghasilkan array NumPy raksasa (500 × 784 = 392.000 elemen) yang menumpuk di memori karena tidak pernah di-*deallocate*.
+   - **Solusi:** Jumlah sampel diturunkan dari 500 menjadi **300**, dan seluruh array besar (`pixel_data`, `flat_pixels`, `stroke_pixels`, `avg_image`) secara eksplisit dihapus menggunakan `del` setelah selesai digunakan.
+
+3. **Tidak Ada Error Boundary:** Seluruh blok rendering Tab 4 tidak dibungkus dalam penanganan *exception*, sehingga error sekecil apapun (tipe data, reshape, atau memory) langsung menjatuhkan seluruh aplikasi Streamlit.
+   - **Solusi:** Seluruh logika rendering (sampling gambar, Ghost Image, Histogram) kini dibungkus dalam blok `try/except` yang menampilkan pesan error informatif (`st.error(...)`) alih-alih mematikan aplikasi.
+
+---
+
+## 📁 Hasil Akhir & Berkas Kunci
+- `notebooks/Dyslexia_EMNIST.ipynb`: Pipeline data wrangling EMNIST end-to-end yang baru dan seimbang.
+- `app.py`: Dashboard yang sudah stabil (2 gelombang perbaikan crash), referensi file lama dihapus.
+- `csv_metadata/dyslexialens_test_EMNIST.csv.gz` & `csv_metadata/dyslexialens_test_noAugmentation.csv.gz`: Dataset *compressed* untuk eksplorasi piksel di dashboard secara efisien.
+- `assets/*`: Visualisasi EDA (distribusi kelas, severity, heatmap) untuk EMNIST maupun versi No Augmentation, dengan format penamaan yang telah disempurnakan.
 
 ---
 
