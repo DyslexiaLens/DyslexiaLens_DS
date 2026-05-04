@@ -36,9 +36,9 @@ dataset_choice = st.sidebar.radio(
 )
 
 if dataset_choice == "Dataset Dengan Augmentasi (Gambo + EMNIST)":
-    csv_path = 'csv_metadata/master_dataset_dyslexia.csv'
+    csv_path = 'csv_metadata/Dataset_Dyslexia_EMNIST.csv'
 else:
-    csv_path = 'csv_metadata/Rainy/Dataset_Dyslexia_NoAugmentation.csv'
+    csv_path = 'csv_metadata/Dataset_Dyslexia_NoAugmentation.csv'
 
 st.sidebar.info(f"**File Aktif:**\n`{csv_path}`")
 
@@ -48,6 +48,12 @@ def load_master_data(path):
     if os.path.exists(path):
         return pd.read_csv(path)
     return None
+
+@st.cache_data
+def load_compressed_csv(path):
+    if not os.path.exists(path):
+        return None
+    return pd.read_csv(path)
 
 df_master = load_master_data(csv_path)
 
@@ -73,12 +79,14 @@ with tab1:
             st.markdown("#### Distribusi Kelas Keseluruhan")
             class_counts = df_master['target_class'].value_counts().rename({0: 'Normal (0)', 1: 'Dyslexia (1)'})
             fig, ax = plt.subplots(figsize=(6, 4))
-            colors = ['#E74C3C', '#2ECC71'] if 'Dyslexia' in str(class_counts.index[0]) else ['#2ECC71', '#E74C3C']
-            class_counts.plot(kind='bar', color=colors, ax=ax)
-            ax.set_ylabel("Jumlah Gambar")
-            plt.xticks(rotation=0)
-            st.pyplot(fig)
-            plt.close(fig)
+            try:
+                colors = ['#E74C3C', '#2ECC71'] if 'Dyslexia' in str(class_counts.index[0]) else ['#2ECC71', '#E74C3C']
+                class_counts.plot(kind='bar', color=colors, ax=ax)
+                ax.set_ylabel("Jumlah Gambar")
+                ax.tick_params(axis='x', rotation=0)
+                st.pyplot(fig)
+            finally:
+                plt.close(fig)
             
         with col2:
             st.markdown("#### Proporsi Stratified (Train vs Test)")
@@ -89,7 +97,7 @@ with tab1:
             st.dataframe(comparison_df.style.format("{:.2f}%"), width='stretch')
             st.info("💡 **Stratifikasi Berhasil!** Proporsi kelas Normal dan Dyslexia identik di set Train dan Test, mencegah adanya Domain Shift.")
     else:
-        st.error("csv_metadata/master_dataset_dyslexia.csv tidak ditemukan!")
+        st.error("csv_metadata/Dataset_Dyslexia_EMNIST.csv tidak ditemukan!")
 
 # ==========================================
 # TAB 2: BUSINESS QUESTIONS & EDA
@@ -99,8 +107,8 @@ with tab2:
     st.write("Apakah pola goresan tulisan tangan dapat digunakan sebagai indikator tingkat keparahan disleksia?")
     
     # Tentukan suffix gambar berdasarkan dataset yang dipilih
-    is_rainy = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
-    img_suffix = '_rainy' if is_rainy else ''
+    is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
+    img_suffix = '_noAugmentation' if is_noAugmentation else '_EMNIST'
     
     if df_master is not None:
         st.markdown("#### 📊 Distribusi Kelas per Split")
@@ -129,7 +137,7 @@ with tab2:
         st.divider()
 
         st.markdown("#### 🖼️ Sampel Visual Keparahan Tulisan")
-        if is_rainy:
+        if is_noAugmentation:
             st.write("Berikut adalah perbandingan wujud asli tulisan dari penderita gejala ringan (Skor 1) hingga parah (Skor 6):")
         else:
             st.write("Berikut adalah perbandingan wujud asli tulisan dari penderita gejala ringan (Skor 2) hingga parah (Skor 6):")
@@ -142,43 +150,40 @@ with tab2:
         st.divider()
             
     # === HEATMAP ===
-    if is_rainy:
+    if is_noAugmentation:
         st.markdown("#### 🔥 Heatmap Rata-rata Piksel: Skor 1 (Paling Ringan) vs Skor 6 (Parah)")
         st.write("Visualisasi ini membuktikan secara matematis bahwa ada perbedaan ketebalan goresan (koreksi/reversal) antara penderita gejala ringan dan parah.")
-        if os.path.exists('assets/heatmap_rainy.png'):
-            st.image('assets/heatmap_rainy.png', width='stretch')
-            st.success("**Rata-rata selisih intensitas piksel:** Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
+        if os.path.exists('assets/heatmap_noAugmentation.png'):
+            st.image('assets/heatmap_noAugmentation.png', width='stretch')
+            st.success("**Rata-rata selisih intensitas piksel:** ~16.57 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
         else:
-            st.warning("⚠️ File `assets/heatmap_rainy.png` tidak ditemukan.")
+            st.warning("⚠️ File `assets/heatmap_noAugmentation.png` tidak ditemukan.")
     else:
-        st.markdown("#### 🔥 Heatmap Rata-rata Piksel: Skor 2 (Paling Ringan) vs Skor 6 (Parah)")
+        st.markdown("#### 🔥 Heatmap Rata-rata Piksel: Skor 1 (Paling Ringan) vs Skor 6 (Parah)")
         st.write("Visualisasi ini membuktikan secara matematis bahwa ada perbedaan ketebalan goresan (koreksi/reversal) antara penderita gejala ringan dan parah.")
-        if os.path.exists('assets/heatmap_eda.png'):
-            st.image('assets/heatmap_eda.png', width='stretch')
-            st.success("**Rata-rata selisih intensitas piksel:** ~5.20 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
+        if os.path.exists('assets/heatmap_EMNIST.png'):
+            st.image('assets/heatmap_EMNIST.png', width='stretch')
+            st.success("**Rata-rata selisih intensitas piksel:** ~14.00 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
         else:
-            st.warning("⚠️ File `assets/heatmap_eda.png` tidak ditemukan.")
+            st.warning("⚠️ File `assets/heatmap_EMNIST.png` tidak ditemukan.")
         
     st.divider()
     if df_master is not None:
         st.markdown("#### 🔠 Karakter Paling Sering Muncul")
         
-        @st.cache_data
-        def get_char_counts(df):
-            # Extract first alphanumeric character as the letter
-            chars = df['file_name'].str.extract(r'([a-zA-Z0-9])')[0].str.lower()
-            return chars.value_counts().head(20)
-            
-        char_counts = get_char_counts(df_master)
+        chars = df_master['file_name'].str.extract(r'([a-zA-Z0-9])')[0].str.lower()
+        char_counts = chars.value_counts().head(20)
         
         fig, ax = plt.subplots(figsize=(10, 4))
-        char_counts.plot(kind='bar', color='#9B59B6', ax=ax)
-        plt.title('Top 20 Karakter Terbanyak dalam Dataset')
-        plt.ylabel('Jumlah Kemunculan')
-        plt.xlabel('Karakter')
-        plt.xticks(rotation=0)
-        st.pyplot(fig)
-        plt.close(fig)
+        try:
+            char_counts.plot(kind='bar', color='#9B59B6', ax=ax)
+            ax.set_title('Top 20 Karakter Terbanyak dalam Dataset')
+            ax.set_ylabel('Jumlah Kemunculan')
+            ax.set_xlabel('Karakter')
+            ax.tick_params(axis='x', rotation=0)
+            st.pyplot(fig)
+        finally:
+            plt.close(fig)
         st.info("💡 Grafik ini membantu memvalidasi apakah huruf rawan disleksia seperti **b, d, p, q** sudah terwakili dengan baik dalam dataset.")
 
 # ==========================================
@@ -221,39 +226,34 @@ with tab3:
             source_counts.index = ['Normal (0)', 'Dyslexia (1)']
             
             fig, ax = plt.subplots(figsize=(8, 4))
-            available_sources = source_counts.columns.tolist()
-            
-            # Pewarnaan dinamis
-            color_map = {'gambo': '#F39C12', 'emnist': '#3498DB', 'normal': '#2ECC71', 'corrected': '#E74C3C', 'reversal': '#9B59B6'}
-            colors = [color_map.get(s.lower(), '#95A5A6') for s in available_sources]
-            
-            source_counts.plot(kind='bar', stacked=True, ax=ax, color=colors)
-            plt.title(chart_title)
-            plt.ylabel('Jumlah Gambar')
-            plt.xticks(rotation=0)
-            plt.legend(title=col_to_stack.title())
-            
-            # Tambahkan anotasi teks di dalam bar
-            for c in ax.containers:
-                ax.bar_label(c, label_type='center', color='white', fontweight='bold', fmt='%d')
+            try:
+                available_sources = source_counts.columns.tolist()
                 
-            st.pyplot(fig)
-            plt.close(fig)
+                # Pewarnaan dinamis
+                color_map = {'gambo': '#F39C12', 'emnist': '#3498DB', 'normal': '#2ECC71', 'corrected': '#E74C3C', 'reversal': '#9B59B6'}
+                colors = [color_map.get(s.lower(), '#95A5A6') for s in available_sources]
+                
+                source_counts.plot(kind='bar', stacked=True, ax=ax, color=colors)
+                ax.set_title(chart_title)
+                ax.set_ylabel('Jumlah Gambar')
+                ax.tick_params(axis='x', rotation=0)
+                ax.legend(title=col_to_stack.title())
+                
+                for c in ax.containers:
+                    ax.bar_label(c, label_type='center', color='white', fontweight='bold', fmt='%d')
+                    
+                st.pyplot(fig)
+            finally:
+                plt.close(fig)
 
 # ==========================================
 # TAB 4: DATASET VIEWER (COMPRESSED CSV)
 # ==========================================
 with tab4:
     st.markdown("### 👁️ Eksplorasi Data (Compressed CSV)")
-    @st.cache_data
-    def load_compressed_csv(csv_path):
-        if not os.path.exists(csv_path):
-            return None
-        # Load SEMUA baris karena file .gz kita ringan
-        return pd.read_csv(csv_path)
 
-    is_rainy = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
-    csv_file = 'dyslexialens_test_rainy.csv.gz' if is_rainy else 'dyslexialens_test.csv.gz'
+    is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
+    csv_file = 'csv_metadata/dyslexialens_test_noAugmentation.csv.gz' if is_noAugmentation else 'csv_metadata/dyslexialens_test_EMNIST.csv.gz'
     df_pixels = load_compressed_csv(csv_file)
     
     file_size_mb = os.path.getsize(csv_file) / (1024 * 1024) if os.path.exists(csv_file) else 0
@@ -279,10 +279,12 @@ with tab4:
             for i, (_, row) in enumerate(samples.iterrows()):
                 pixels = row.values[1:].reshape(28, 28)
                 fig, ax = plt.subplots(figsize=(2,2))
-                ax.imshow(pixels, cmap='gray', vmin=0, vmax=255)
-                ax.axis('off')
-                cols[i % 5].pyplot(fig)
-                plt.close(fig)
+                try:
+                    ax.imshow(pixels, cmap='gray', vmin=0, vmax=255)
+                    ax.axis('off')
+                    cols[i % 5].pyplot(fig)
+                finally:
+                    plt.close(fig)
                 
             st.divider()
             st.markdown("#### 📈 Analisis Piksel Interaktif")
@@ -298,11 +300,13 @@ with tab4:
                 avg_image = np.mean(pixel_data, axis=0).reshape(28, 28)
                 
                 fig, ax = plt.subplots(figsize=(4, 4))
-                ax.imshow(avg_image, cmap='gray', vmin=0, vmax=255)
-                ax.axis('off')
-                plt.title(f"Pola Rata-rata dari {n_samples} sampel acak")
-                st.pyplot(fig)
-                plt.close(fig)
+                try:
+                    ax.imshow(avg_image, cmap='gray', vmin=0, vmax=255)
+                    ax.axis('off')
+                    ax.set_title(f"Pola Rata-rata dari {n_samples} sampel acak")
+                    st.pyplot(fig)
+                finally:
+                    plt.close(fig)
                 
             # Idea 3: Histogram
             with col_chart2:
@@ -311,12 +315,14 @@ with tab4:
                 stroke_pixels = flat_pixels[flat_pixels > 10]
                 
                 fig, ax = plt.subplots(figsize=(5, 4))
-                ax.hist(stroke_pixels, bins=30, color='#34495E', alpha=0.7)
-                plt.title("Distribusi Intensitas Piksel Goresan (>10)")
-                plt.xlabel("Intensitas (0-255)")
-                plt.ylabel("Frekuensi")
-                st.pyplot(fig)
-                plt.close(fig)
+                try:
+                    ax.hist(stroke_pixels, bins=30, color='#34495E', alpha=0.7)
+                    ax.set_title("Distribusi Intensitas Piksel Goresan (>10)")
+                    ax.set_xlabel("Intensitas (0-255)")
+                    ax.set_ylabel("Frekuensi")
+                    st.pyplot(fig)
+                finally:
+                    plt.close(fig)
                 
                 mean_intensity = np.mean(stroke_pixels) if len(stroke_pixels) > 0 else 0
                 st.caption(f"Rata-rata intensitas goresan untuk {n_samples} sampel ini: **{mean_intensity:.1f}**")
