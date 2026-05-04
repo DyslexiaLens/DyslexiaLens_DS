@@ -175,7 +175,9 @@ Status keseluruhan dapat dilihat di file `Data Scientist Checklist.md`.
 
 ## 📄 Lisensi & Dataset
 Dataset `Gambo` adalah dataset publik. Harap perhatikan lisensi asli dataset sebelum mendistribusikan ulang.
-https://www.kaggle.com/datasets/drizasazanitaisa/dyslexia-handwriting-dataset
+https://www.kaggle.com/datasets/drizasazanitaisa/dyslexia-handwriting-dataset\\
+Dataset `EMNIST` adalah dataset publik.
+https://www.kaggle.com/datasets/crawford/emnist
 1. M. S. A. B. Rosli, I. S. Isa, S. A. Ramlan, S. N. Sulaiman and M. I. F. Maruzuki, "Development of CNN Transfer Learning for Dyslexia Handwriting Recognition," 2021 11th IEEE International Conference on Control System, Computing and Engineering (ICCSCE), 2021, pp. 194-199, doi: 10.1109/ICCSCE52189.2021.9530971.
 2. N. S. L. Seman, I. S. Isa, S. A. Ramlan, W. Li-Chih and M. I. F. Maruzuki, "Notice of Removal: Classification of Handwriting Impairment Using CNN for Potential Dyslexia Symptom," 2021 11th IEEE International Conference on Control System, Computing and Engineering (ICCSCE), 2021, pp. 188-193, doi: 10.1109/ICCSCE52189.2021.9530989.
 3. Isa, Iza Sazanita. CNN Comparisons Models On Dyslexia Handwriting Classification / Iza Sazanita Isa … [et Al.]. Universiti Teknologi MARA Cawangan Pulau Pinang, 2021.
