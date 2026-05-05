@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 env/
 *env
+master_dataset_final.csv
 
 # Dataset Folders (Huge Physical Files)
 Dataset/
@@ -26,3 +27,4 @@ reports/
 .idea/
 .DS_Store
 prompt/
+
