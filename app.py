@@ -186,6 +186,38 @@ with tab2:
             plt.close(fig)
         st.info("💡 Grafik ini membantu memvalidasi apakah huruf rawan disleksia seperti **b, d, p, q** sudah terwakili dengan baik dalam dataset.")
 
+    # === FEATURE ENGINEERING ===
+    st.divider()
+    st.markdown("#### 🔬 Feature Engineering (Fitur Turunan Matematis)")
+    st.write("Fitur-fitur berikut diekstrak secara otomatis dari setiap gambar 28×28 piksel untuk memperkaya data tabular yang diserahkan kepada AI Engineer.")
+    
+    feature_cols = ['ink_density', 'center_of_mass_x', 'center_of_mass_y', 
+                    'bounding_box_ratio', 'stroke_transitions']
+    
+    # Tampilkan gambar distribusi jika ada
+    fe_img = 'assets/feature_engineering_distribution_noAugmentation.png'
+    if os.path.exists(fe_img):
+        st.image(fe_img, width='stretch')
+    
+    # Tampilkan statistik jika kolom fitur tersedia di master CSV
+    if df_master is not None and all(col in df_master.columns for col in feature_cols):
+        col_fe1, col_fe2 = st.columns(2)
+        
+        with col_fe1:
+            st.write("**Rata-rata Fitur per Kelas**")
+            summary = df_master.groupby('target_class')[feature_cols].mean()
+            summary.index = ['Normal (0)', 'Disleksia (1)']
+            st.dataframe(summary.style.format("{:.4f}"), width='stretch')
+        
+        with col_fe2:
+            st.write("**Selisih Absolut (Disleksia − Normal)**")
+            diff = summary.loc['Disleksia (1)'] - summary.loc['Normal (0)']
+            diff_df = diff.to_frame(name='Selisih')
+            st.dataframe(diff_df.style.format("{:.4f}"), width='stretch')
+            st.caption("Fitur dengan selisih terbesar menunjukkan potensi diskriminatif tertinggi untuk model AI.")
+    else:
+        st.info("💡 Jalankan **Tahap 7 (Feature Engineering)** di notebook terlebih dahulu untuk melihat statistik fitur di sini.")
+
 # ==========================================
 # TAB 3: DATA PREP & STRATIFICATION
 # ==========================================
