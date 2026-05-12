@@ -38,7 +38,7 @@ dataset_choice = st.sidebar.radio(
 if dataset_choice == "Dataset Dengan Augmentasi (Gambo + EMNIST)":
     csv_path = 'csv_metadata/Dataset_Dyslexia_EMNIST.csv'
 else:
-    csv_path = 'csv_metadata/Dataset_Dyslexia_NoAugmentation.csv'
+    csv_path = 'csv_metadata/Dataset_Dyslexia_NoAugmentation_FeatureEngineering.csv'
 
 st.sidebar.info(f"**File Aktif:**\n`{csv_path}`")
 
@@ -155,7 +155,7 @@ with tab2:
         st.write("Visualisasi ini membuktikan secara matematis bahwa ada perbedaan ketebalan goresan (koreksi/reversal) antara penderita gejala ringan dan parah.")
         if os.path.exists('assets/heatmap_noAugmentation.png'):
             st.image('assets/heatmap_noAugmentation.png', width='stretch')
-            st.success("**Rata-rata selisih intensitas piksel:** ~16.57 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
+            st.success("**Rata-rata selisih intensitas piksel:** ~12.18 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
         else:
             st.warning("⚠️ File `assets/heatmap_noAugmentation.png` tidak ditemukan.")
     else:
