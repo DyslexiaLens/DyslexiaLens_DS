@@ -1,184 +1,116 @@
-# 🧠 DyslexiaLens — Data Science Repository
+# 🧠 DyslexiaLens — Data Science & XAI Repository
 
 > Bagian Data Science dari Capstone Project **DyslexiaLens**: Intelligent Handwriting Detection and Assistance for Dyslexia.
 >
-> Repositori ini berisi seluruh proses kerja Data Scientist, mulai dari eksplorasi dan audit dataset, pembersihan data, pembuatan pipeline preprocessing, hingga dataset final yang siap digunakan oleh tim AI Engineer untuk proses pelatihan model.
+> Repositori ini berisi seluruh proses kerja Data Scientist, mulai dari eksplorasi dan audit dataset, pembersihan data (*Data Wrangling*), pemecahan masalah *Class Imbalance* menggunakan injeksi eksternal (**EMNIST**), perumusan fitur *Explainable AI* (XAI), hingga pembuatan *Streamlit Executive Dashboard*.
 
 ---
 
 ## 📌 Tentang Proyek
 
-**DyslexiaLens** adalah sistem *early screening* disleksia berbasis analisis citra tulisan tangan. Sistem ini **bukan alat diagnosis medis**, melainkan alat bantu skrining awal yang dapat digunakan oleh orang tua dan pendidik sebelum pemeriksaan lebih lanjut oleh profesional.
+**DyslexiaLens** adalah sistem *early screening* disleksia berbasis analisis citra tulisan tangan. Sistem ini **bukan alat diagnosis medis**, melainkan alat bantu skrining awal yang dapat digunakan oleh orang tua dan pendidik sebelum pemeriksaan klinis lebih lanjut.
+
+Pada repositori ini, fokus utama adalah membangun **Pondasi Data yang Kokoh** dan memastikan AI yang dibangun nantinya tidak menjadi *"Black Box"* (memiliki kapabilitas dapat dijelaskan/diinterpretasi).
 
 | Detail | Keterangan |
 |---|---|
 | **Tema** | Accessible & Adaptive Learning |
-| **Peran Repositori Ini** | Data Science — Dataset Preparation & Analysis |
-| **Dataset Utama** | Gambo (Handwriting Dyslexia Dataset) |
-| **Total Sampel Awal** | 208.372 gambar `.png` |
-| **Total Sampel Bersih** | ~180.726 gambar (setelah drop kontaminasi label) |
-| **Format Output Final** | `master_dataset_final.csv` (Train, Val, Test) |
+| **Fokus Utama** | Data Engineering, Feature Engineering (XAI), & Dashboarding |
+| **Dataset Primer** | Gambo (Handwriting Dyslexia Dataset) |
+| **Dataset Sekunder** | EMNIST (Digunakan untuk injeksi ekuilibrium kelas Normal) |
+| **Total Sampel (Balanced)** | ~273.000 gambar (Rasio 1:1 Normal vs Disleksia) |
+| **Aplikasi Presentasi** | Streamlit Interactive Dashboard (`app.py`) |
 
 ---
 
-## 🗂️ Struktur Repositori
+## 🗂️ Struktur Repositori Terkini
 
-```
+```text
 Dataset Disleksia/
 │
-├── 📓 Dyslexia.ipynb               # Notebook utama preprocessing & CSV generation
-├── 📊 master_dataset_final.csv     # Output dataset siap training (di-gitignore)
-├── 🔒 .gitignore
+├── 📊 app.py                       # Streamlit Executive Dashboard (UI/UX)
+├── 📁 assets/                      # Aset visual EDA untuk Streamlit
+│   ├── EMNIST/                     # Grafik dataset augmentasi
+│   └── noAugmentation/             # Grafik dataset murni
 │
-├── 📁 Gambo/                       # Dataset asli (di-gitignore, unduh terpisah)
+├── 📁 csv_metadata/                # Output tabular final (Siap Training!)
+│   ├── Dataset_Dyslexia_EMNIST_FeatureEngineering.csv
+│   └── dyslexialens_test_EMNIST.csv.gz (Compressed Pixel Viewer)
 │
-├── 📁 Python Stuff/                # Script Python helper
-│   ├── dataset_stats_script.py     
-│   ├── generate_csv.py             
-│   ├── preprocess_gambo.py         
-│   └── viz.py                      
+├── 📁 notebooks/
+│   ├── 📓 Dyslexia_EMNIST.ipynb    # Notebook utama pipeline EMNIST
+│   ├── 📓 Dyslexia_NoAugment.ipynb # Notebook utama pipeline murni
 │
-└── 📁 Dokumentasi/
-    ├── Rainy/                      # Dokumentasi Data Scientist (penulis repo)
-    |   ├── Checkpoint/             
-    |   |   ├── Checkpoint3.md      # Rekap progres terkini
-    |   ├── Pembahasan Pembagian Dataset / Todo/
-    |   |   ├── Diskusi_Binary_vs_Severity.md
-    |   |   ├── Rangkuman_Opsi_Dataset_Training.md
-    |   |   └── todo.md             # Rencana Sistem Translasi OCR 
-    │   ├── Analisis Dataset.md     
-    │   ├── Data Scientist Checklist.md
-    │   ├── Koreksi Disleksia.md    
-    │   ├── Penjelasan_Kelas_Dataset.md  
-    │   ├── Pipeline_Preprocessing_Data.md  
-    │   ├── Explanatory_Analysis.md 
-    │   └── Temuan_EDA.md           # Parameter class_weight AI Engineer
-    └── Referensi/                  # Dokumen referensi tim
+├── 📁 Python Stuff/                # Script utilitas Python (Legacy)
+└── 📁 Dokumentasi/                 # Catatan diskusi dan audit historis
 ```
 
 ---
 
-## 🔬 Alur Kerja Data Science
+## 🔬 Alur Kerja Data Science (Pipeline)
 
-### Tahap 1 — Eksplorasi & Audit Dataset
-Melakukan analisis mendalam pada dataset `Gambo` menggunakan script Python:
-- Menghitung distribusi gambar per kelas dan per split.
-- Memvalidasi konsistensi format file (resolusi, tipe warna, ekstensi).
-- Melakukan inspeksi visual manual pada sampel gambar.
+### Tahap 1 — Audit Kritis & Normalisasi
+Ditemukan dua anomali kritis pada dataset publik Gambo:
+1. **Sistem Severity Score Terbalik:** Folder numerik (`1-9`) ternyata bukan karakter angka, melainkan skala keparahan tulisan. Kami menormalisasinya menjadi skala linear `0` (Normal) hingga `6` (Paling Parah).
+2. **Kontaminasi Label:** Ditemukan file `NormalXXXX.png` yang terselip di dalam folder disleksia. Masalah ini diselesaikan melalui *Logical Cleaning* menggunakan metode *Boolean Masking* di Pandas.
 
-Temuan penting dapat dibaca di: [`Dokumentasi/Rainy/Analisis Dataset.md`](Dokumentasi/Rainy/Analisis%20Dataset.md)
+### Tahap 2 — Resolusi "Class Imbalance"
+Dataset murni Gambo memiliki ketimpangan ekstrem di mana kelas *Disleksia* jauh lebih banyak dari *Normal*.
+*   **Solusi:** Kami melakukan injeksi data dari dataset eksternal (**EMNIST**) secara deterministik menggunakan algoritma *Fair Pruning* (Top-Down Indexing).
+*   **Hasil:** Tercapai titik ekuilibrium **1:1** (~142.000 Disleksia vs ~131.000 Normal), sehingga mencegah model AI dari kerentanan *Majority Class Bias*.
 
----
+### Tahap 3 — Feature Engineering (Membangun XAI)
+Untuk memastikan arsitektur *Late Fusion CNN* kelak memiliki kemampuan **Explainable AI (XAI)**, kami mengekstrak 5 fitur matematis-geometri dari setiap matriks 28x28 piksel:
+1.  `ink_density`: Mendeteksi indikasi *Over-tracing* (coretan ragu-ragu/berulang).
+2.  `center_of_mass_x` & `y`: Mendeteksi pergeseran spasial ekstrem.
+3.  `bounding_box_ratio`: Mendeteksi distorsi proporsi dimensi huruf.
+4.  `stroke_transitions`: Menghitung frekuensi getaran/tremor motorik saat menulis.
+5.  `horizontal_symmetry`: Indikator pendeteksi utama untuk *Reversal* (tulisan terbalik).
 
-### Tahap 2 — Data Auditing (Penemuan Kritis)
-Selama proses audit, ditemukan dua anomali kritis:
-
-**1. Sistem Severity Score (Temuan Utama)**
-Folder numerik (`1, 4, 5, 6, 7, 8, 9`) di dalam kelas `Corrected` dan `Reversal` **bukan** merujuk pada karakter angka, melainkan merepresentasikan **Tingkat Keparahan Goresan (Severity Score)**. Dengan skala asli yang terbalik: `1` = Paling Parah, `9` = Paling Ringan.
-
-**2. Kontaminasi Label (Label Noise)**
-Ditemukan file bernama `NormalXXXX.png` yang terselip di dalam folder `Corrected` dan `Reversal`, namun isinya secara visual adalah goresan yang sangat cacat — bukan tulisan normal.
-
-Detail selengkapnya: [`Dokumentasi/Rainy/Koreksi Disleksia.md`](Dokumentasi/Rainy/Koreksi%20Disleksia.md)
-
----
-
-### Tahap 3 — Preprocessing & Normalisasi
-Dua pendekatan preprocessing diterapkan:
-
-**A. Physical Renaming (Tahap 2 Notebook)**
-Mengkoreksi nama file menjadi skala keparahan numerik 1-6 agar linear (1=Ringan, 6=Terparah).
-*Catatan: Digabungnya Reversal (1) dan Corrected Terparah (4) membentuk puncak skor di 6.*
-
-**B. Logical Cleaning via CSV (Tahap 3 Notebook)**
-Membuang gambar cacat label (`NormalXXXX.png`) dari metadata tanpa merusak file Windows aslinya.
-
-**C. Stratified Validation Split & Class Weights (Tahap 5 Notebook)**
-* Dataset dipecah menjadi **Train (60.6%), Validation (15.2%), Test (24.2%)** tanpa *Data Leakage*.
-* **Augmentasi Offline Dibatalkan** agar dataset tetap alami (180.726).
-* Ketidakseimbangan data ditangani murni menggunakan nilai **`class_weight`** yang dikalkulasi menggunakan Scikit-Learn.
+### Tahap 4 — Executive Dashboarding
+Membuat aplikasi *Streamlit* untuk menjawab 4 Pertanyaan Bisnis utama secara interaktif dan mempresentasikan hasil *Computer Vision Analytics* (Heatmap) serta Profil Klinis (KDE Plots) kepada *stakeholders*.
 
 ---
 
-### Tahap 4 — Output: Final Dataset & Handover
-File `master_dataset_final.csv` adalah output akhir *pipeline* yang akan di-training oleh ***AI Engineer***.
+## 🚀 Cara Menjalankan Dashboard
 
-| Kolom | Deskripsi |
-|---|---|
-| `image_path` | Jalur absolut lokasi file gambar |
-| `split` | `Train`, `Validation`, atau `Test` |
-| `folder_category` | Kategori sumber: `Normal`, `Corrected`, `Reversal` |
-| `severity_score` | Skor keparahan disleksia regresif (0 Sehat — 6 Ekstrem) |
-| `target_class` | Target KLASIFIKASI BINER (0 Normal vs 1 Disleksia) |
+Untuk mempresentasikan hasil pipeline ini secara interaktif, jalankan perintah berikut di terminal:
 
----
-
-## 🚀 Cara Menjalankan
-
-### Prasyarat
 ```bash
-pip install pandas Pillow
+pip install streamlit pandas numpy matplotlib
+streamlit run app.py
 ```
-
-### Langkah-langkah
-1. **Unduh dataset** `Gambo` dan letakkan di dalam folder root repositori ini.
-2. **Buka** `Dyslexia.ipynb` menggunakan Jupyter Notebook atau Google Colab.
-3. **Sesuaikan** variabel `root_dir` di setiap cell dengan path dataset Anda:
-   - Lokal: `r'Gambo'`
-   - Google Colab: `r'/content/drive/MyDrive/Gambo'`
-4. **Jalankan** cell secara berurutan:
-   - **Tahap 0** *(Opsional)*: Physical renaming file ke skala 1–6.
-   - **Tahap 1** *(Wajib)*: Generate `master_dataset_dyslexia.csv`.
-
-> [!WARNING]
-> Jalankan **Tahap 0 hanya sekali**. Menjalankannya dua kali pada dataset yang sudah di-rename akan menyebabkan skala bergeser dan data menjadi kacau!
+*Gunakan toggle di sidebar untuk melihat perbedaan analitik antara dataset Murni (No Augmentation) dan dataset Augmentasi (EMNIST).*
 
 ---
 
-## 📊 Statistik Dataset Final
+## 📋 Checklist Progres Akhir Data Scientist
 
-| Split | Normal | Corrected | Reversal | Total |
-|---|---|---|---|---|
-| Train | 39.334 | ~52.000* | ~40.000* | ~131.334 |
-| Test | 19.557 | ~16.000* | ~14.000* | ~49.557 |
-| **Total** | **58.891** | **~68.000*** | **~54.000*** | **~180.726** |
+- [x] Eksplorasi dan audit anomali dataset `Gambo`
+- [x] Logical Cleaning & Normalisasi Skala Keparahan (1-6)
+- [x] Injeksi EMNIST & Algoritma Fair Pruning untuk Balancing (Rasio 1:1)
+- [x] Computer Vision Analytics (Variance & Difference Heatmaps)
+- [x] Feature Engineering 5 Variabel Matematis Geometri (XAI)
+- [x] Stratified Split Dataset (Train, Test) untuk mencegah Data Leakage
+- [x] Ekspor *Compressed Pixel CSV* (`.csv.gz`) untuk *viewer* statis
+- [x] Pembuatan Executive Dashboard interaktif dengan Streamlit
+- [x] Standardisasi Dokumentasi Markdown (*Handover Ready*)
 
-*\*Angka perkiraan setelah drop kontaminasi label.*
+**Status: 100% COMPLETE. SIAP DISERAHKAN KE TIM AI ENGINEER.**
 
----
-
-## 📋 Checklist Progres Data Scientist
-
-- [x] Eksplorasi dan audit dataset `Gambo`
-- [x] Identifikasi Severity Score & Skala Asli
-- [x] Deteksi kontaminasi label (`NormalXXXX.png`)
-- [x] Logical Cleaning via Pandas DataFrame
-- [x] Normalisasi skala severity (Dictionary Mapping → 0–6)
-- [x] Generate `master_dataset_dyslexia.csv`
-- [x] Exploratory Data Analysis & Explanatory Analysis Visual
-- [x] Stratified Split Dataset (Train, Val, Test) tanpa *Leakage*
-- [x] Kalkulasi Parameter `class_weight` Murni (Zero Data Loss)
-- [x] Dokumentasi Data Dictionary & Strategy Blueprint
-- [x] Handover Endpoint CSV: `master_dataset_final.csv`
-
-Status keseluruhan dapat dilihat di file `Data Scientist Checklist.md`.
 ---
 
 ## 👤 Kontributor
 
 | Nama | Role | Fokus |
 |---|---|---|
-| Rainy | Data Scientist | Dataset preparation, preprocessing, EDA |
-| w0pal | *(Anggota Tim)* | *(sesuai pembagian tugas)* |
+| Rainy | Data Scientist | Dataset Auditing, Data Wrangling, Stratified Splitting, XAI Feature Engineering, & Dashboarding Streamlit |
+| w0pal | Data Scientist | EMNIST-GAMBO Integration (Balancing), Metadata Construction, & Pipeline Automation |
 
 ---
 
-## 📄 Lisensi & Dataset
-Dataset `Gambo` adalah dataset publik. Harap perhatikan lisensi asli dataset sebelum mendistribusikan ulang.
-https://www.kaggle.com/datasets/drizasazanitaisa/dyslexia-handwriting-dataset\\
-Dataset `EMNIST` adalah dataset publik.
-https://www.kaggle.com/datasets/crawford/emnist
-1. M. S. A. B. Rosli, I. S. Isa, S. A. Ramlan, S. N. Sulaiman and M. I. F. Maruzuki, "Development of CNN Transfer Learning for Dyslexia Handwriting Recognition," 2021 11th IEEE International Conference on Control System, Computing and Engineering (ICCSCE), 2021, pp. 194-199, doi: 10.1109/ICCSCE52189.2021.9530971.
-2. N. S. L. Seman, I. S. Isa, S. A. Ramlan, W. Li-Chih and M. I. F. Maruzuki, "Notice of Removal: Classification of Handwriting Impairment Using CNN for Potential Dyslexia Symptom," 2021 11th IEEE International Conference on Control System, Computing and Engineering (ICCSCE), 2021, pp. 188-193, doi: 10.1109/ICCSCE52189.2021.9530989.
-3. Isa, Iza Sazanita. CNN Comparisons Models On Dyslexia Handwriting Classification / Iza Sazanita Isa … [et Al.]. Universiti Teknologi MARA Cawangan Pulau Pinang, 2021.
-4. Isa, I. S., Rahimi, W. N. S., Ramlan, S. A., & Sulaiman, S. N. (2019). Automated detection of dyslexia symptom based on handwriting image for primary school children. Procedia Computer Science, 163, 440-449.
+## 📄 Lisensi & Referensi Dataset
+*   Dataset **Gambo**: Publik (https://www.kaggle.com/datasets/drizasazanitaisa/dyslexia-handwriting-dataset)
+*   Dataset **EMNIST**: Publik (https://www.kaggle.com/datasets/crawford/emnist)
+
+*(Hak cipta dan kredit penelitian asli tetap mengacu pada author paper Gambo dan EMNIST).*
