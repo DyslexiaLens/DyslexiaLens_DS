@@ -10,8 +10,8 @@ st.set_page_config(page_title="DyslexiaLens - Data Viewer", page_icon="🧠", la
 # CSS Styling
 st.markdown("""
 <style>
-    .main-header { font-size: 45px; font-weight: 800; color: #2C3E50; margin-bottom: -15px; }
-    .sub-header { font-size: 20px; color: #34495E; margin-bottom: 30px; border-bottom: 2px solid #3498DB; padding-bottom: 10px;}
+    .main-header { font-size: 45px; font-weight: 800; color: var(--text-color); margin-bottom: -15px; }
+    .sub-header { font-size: 20px; color: var(--text-color); margin-bottom: 30px; border-bottom: 2px solid #3498DB; padding-bottom: 10px; opacity: 0.8;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -19,11 +19,12 @@ st.markdown('<div class="main-header">🧠 DyslexiaLens Dataset Explorer</div>',
 st.markdown('<div class="sub-header">Data Scientist Handover Dashboard — From Raw Data to Ready-to-Train CSV</div>', unsafe_allow_html=True)
 
 # Membuat Tab
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "📊 Dataset Summary", 
-    "📌 Business Questions & EDA", 
+    "👁️ Computer Vision (Pola Visual)", 
+    "🧠 XAI Profiling (Fitur Geometri)", 
     "🛠 Stratification", 
-    "👁️ Viewer (Compressed CSV)"
+    "🔍 Interactive Viewer"
 ])
 
 # ==========================================
@@ -36,7 +37,7 @@ dataset_choice = st.sidebar.radio(
 )
 
 if dataset_choice == "Dataset Dengan Augmentasi (Gambo + EMNIST)":
-    csv_path = 'csv_metadata/Dataset_Dyslexia_EMNIST.csv'
+    csv_path = 'csv_metadata/Dataset_Dyslexia_EMNIST_FeatureEngineering.csv'
 else:
     csv_path = 'csv_metadata/Dataset_Dyslexia_NoAugmentation_FeatureEngineering.csv'
 
@@ -100,128 +101,67 @@ with tab1:
         st.error("csv_metadata/Dataset_Dyslexia_EMNIST.csv tidak ditemukan!")
 
 # ==========================================
-# TAB 2: BUSINESS QUESTIONS & EDA
+# TAB 2: COMPUTER VISION ANALYTICS
 # ==========================================
 with tab2:
-    st.markdown("### 🎯 Pertanyaan Bisnis & EDA Heatmap")
-    st.write("Apakah pola goresan tulisan tangan dapat digunakan sebagai indikator tingkat keparahan disleksia?")
+    st.markdown("### 👁️ Analisis Spasial & Piksel (Computer Vision)")
     
-    # Tentukan suffix gambar berdasarkan dataset yang dipilih
+    # Path Dinamis berdasarkan pilihan sidebar
     is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
-    img_suffix = '_noAugmentation' if is_noAugmentation else '_EMNIST'
+    img_folder = 'assets/noAugmentation' if is_noAugmentation else 'assets/EMNIST'
+    img_suffix = '_noAugmentation.png' if is_noAugmentation else '_EMNIST.png'
     
-    if df_master is not None:
-        st.markdown("#### 📊 Distribusi Kelas per Split")
-        img_path = f'assets/class_distribution{img_suffix}.png'
-        if os.path.exists(img_path):
-            st.image(img_path, width='stretch')
-        else:
-            st.error(f"Gambar {img_path} tidak ditemukan.")
-        st.divider()
-        
-        st.markdown("#### 📈 Distribusi Keparahan (Severity Score)")
-        img_path = f'assets/severity_distribution{img_suffix}.png'
-        if os.path.exists(img_path):
-            st.image(img_path, width='stretch')
-        else:
-            st.error(f"Gambar {img_path} tidak ditemukan.")
-        st.divider()
-        
-        st.markdown("#### 🖼️ Sampel Kelas: Normal vs Corrected vs Reversal")
-        st.write("Berikut adalah perbandingan wujud asli tulisan dari 3 kelas utama:")
-        img_path = f'assets/class_samples{img_suffix}.png'
-        if os.path.exists(img_path):
-            st.image(img_path, width='stretch')
-        else:
-            st.error(f"Gambar {img_path} tidak ditemukan.")
-        st.divider()
-
-        st.markdown("#### 🖼️ Sampel Visual Keparahan Tulisan")
-        if is_noAugmentation:
-            st.write("Berikut adalah perbandingan wujud asli tulisan dari penderita gejala ringan (Skor 1) hingga parah (Skor 6):")
-        else:
-            st.write("Berikut adalah perbandingan wujud asli tulisan dari penderita gejala ringan (Skor 2) hingga parah (Skor 6):")
-            
-        img_path = f'assets/severity_samples{img_suffix}.png'
-        if os.path.exists(img_path):
-            st.image(img_path, width='stretch')
-        else:
-            st.error(f"Gambar {img_path} tidak ditemukan.")
-        st.divider()
-            
-    # === HEATMAP ===
-    if is_noAugmentation:
-        st.markdown("#### 🔥 Heatmap Rata-rata Piksel: Skor 1 (Paling Ringan) vs Skor 6 (Parah)")
-        st.write("Visualisasi ini membuktikan secara matematis bahwa ada perbedaan ketebalan goresan (koreksi/reversal) antara penderita gejala ringan dan parah.")
-        if os.path.exists('assets/heatmap_noAugmentation.png'):
-            st.image('assets/heatmap_noAugmentation.png', width='stretch')
-            st.success("**Rata-rata selisih intensitas piksel:** ~12.18 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
-        else:
-            st.warning("⚠️ File `assets/heatmap_noAugmentation.png` tidak ditemukan.")
-    else:
-        st.markdown("#### 🔥 Heatmap Rata-rata Piksel: Skor 1 (Paling Ringan) vs Skor 6 (Parah)")
-        st.write("Visualisasi ini membuktikan secara matematis bahwa ada perbedaan ketebalan goresan (koreksi/reversal) antara penderita gejala ringan dan parah.")
-        if os.path.exists('assets/heatmap_EMNIST.png'):
-            st.image('assets/heatmap_EMNIST.png', width='stretch')
-            st.success("**Rata-rata selisih intensitas piksel:** ~14.00 (skala 0-255). Semakin menyala (kuning/putih) warna di Heatmap, semakin sering terjadi coretan berulang di area tersebut.")
-        else:
-            st.warning("⚠️ File `assets/heatmap_EMNIST.png` tidak ditemukan.")
-        
+    st.markdown("#### 🖼️ Sampel Kelas: Normal vs Corrected vs Reversal")
+    st.write("Wujud asli matriks 28x28 untuk membandingkan huruf solid, tarikan berulang (*Over-tracing*), dan pembalikan huruf (*Reversal*).")
+    st.image(f'{img_folder}/class_samples{img_suffix}', width='stretch')
     st.divider()
-    if df_master is not None:
-        st.markdown("#### 🔠 Karakter Paling Sering Muncul")
-        
-        chars = df_master['file_name'].str.extract(r'([a-zA-Z0-9])')[0].str.lower()
-        char_counts = chars.value_counts().head(20)
-        
-        fig, ax = plt.subplots(figsize=(10, 4))
-        try:
-            char_counts.plot(kind='bar', color='#9B59B6', ax=ax)
-            ax.set_title('Top 20 Karakter Terbanyak dalam Dataset')
-            ax.set_ylabel('Jumlah Kemunculan')
-            ax.set_xlabel('Karakter')
-            ax.tick_params(axis='x', rotation=0)
-            st.pyplot(fig)
-        finally:
-            plt.close(fig)
-        st.info("💡 Grafik ini membantu memvalidasi apakah huruf rawan disleksia seperti **b, d, p, q** sudah terwakili dengan baik dalam dataset.")
 
-    # === FEATURE ENGINEERING ===
+    st.markdown("#### 📈 Distribusi Keparahan (Severity Score)")
+    st.write("Melihat spektrum keparahan disleksia yang mendominasi dataset.")
+    st.image(f'{img_folder}/severity_distribution{img_suffix}', width='stretch')
     st.divider()
-    st.markdown("#### 🔬 Feature Engineering (Fitur Turunan Matematis)")
-    st.write("Fitur-fitur berikut diekstrak secara otomatis dari setiap gambar 28×28 piksel untuk memperkaya data tabular yang diserahkan kepada AI Engineer.")
     
-    feature_cols = ['ink_density', 'center_of_mass_x', 'center_of_mass_y', 
-                    'bounding_box_ratio', 'stroke_transitions']
+    # === VARIANCE HEATMAP ===
+    st.markdown("#### 🔥 Variance Heatmap (Tremor vs Solid)")
+    st.write("Visualisasi variansi piksel untuk membuktikan bahwa penderita disleksia menghasilkan tulisan yang jauh lebih inkonsisten/bergetar (tremor) dibanding tulisan Normal.")
     
-    # Tampilkan gambar distribusi jika ada
-    fe_img = 'assets/feature_engineering_distribution_noAugmentation.png'
-    if os.path.exists(fe_img):
-        st.image(fe_img, width='stretch')
-    
-    # Tampilkan statistik jika kolom fitur tersedia di master CSV
-    if df_master is not None and all(col in df_master.columns for col in feature_cols):
-        col_fe1, col_fe2 = st.columns(2)
-        
-        with col_fe1:
-            st.write("**Rata-rata Fitur per Kelas**")
-            summary = df_master.groupby('target_class')[feature_cols].mean()
-            summary.index = ['Normal (0)', 'Disleksia (1)']
-            st.dataframe(summary.style.format("{:.4f}"), width='stretch')
-        
-        with col_fe2:
-            st.write("**Selisih Absolut (Disleksia − Normal)**")
-            diff = summary.loc['Disleksia (1)'] - summary.loc['Normal (0)']
-            diff_df = diff.to_frame(name='Selisih')
-            st.dataframe(diff_df.style.format("{:.4f}"), width='stretch')
-            st.caption("Fitur dengan selisih terbesar menunjukkan potensi diskriminatif tertinggi untuk model AI.")
-    else:
-        st.info("💡 Jalankan **Tahap 7 (Feature Engineering)** di notebook terlebih dahulu untuk melihat statistik fitur di sini.")
+    st.info("#### 🤔 Pertanyaan Bisnis 2\n*Apakah pola visual tulisan tangan cukup kuat merepresentasikan kondisi kognitif disleksia, atau sekadar indikasi ambigu?*")
+    st.image(f'{img_folder}/variance_heatmap{img_suffix}', width='stretch')
+    st.success("✅ **Kesimpulan:** Pola sangat kuat! Area menyala (kuning/jingga) pada Heatmap Disleksia membuktikan secara empiris tingginya variansi/tremor goresan dibandingkan tulisan Normal yang statis.")
+    st.divider()
+
+    # === HEATMAP DIFFERENCE ===
+    st.markdown("#### 🔴 Rata-rata Piksel: Disleksia Ringan vs Parah")
+    st.write("Membedah titik buta (*blind spots*) spasial mana yang paling sering mengalami distorsi parah.")
+    st.image(f'{img_folder}/heatmap{img_suffix}', width='stretch')
 
 # ==========================================
-# TAB 3: DATA PREP & STRATIFICATION
+# TAB 3: EXPLAINABLE AI (XAI) PROFILING
 # ==========================================
 with tab3:
+    st.markdown("### 🧠 Interpretasi Klinis Fitur Geometri (XAI)")
+    
+    is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
+    img_folder = 'assets/noAugmentation' if is_noAugmentation else 'assets/EMNIST'
+    img_suffix = '_noAugmentation.png' if is_noAugmentation else '_EMNIST.png'
+    
+    st.write("Fitur turunan matematis yang bertindak sebagai **Sidik Jari** untuk menjelaskan alasan logis di balik setiap klasifikasi AI.")
+    st.divider()
+    
+    st.info("#### 🤔 Pertanyaan Bisnis 3\n*Bagaimana merancang sistem AI yang tidak hanya akurat, tetapi mampu menjelaskan mengapa suatu tulisan terindikasi disleksia?*")
+    st.image(f'{img_folder}/xai_boxplots{img_suffix}', width='stretch')
+    st.success("✅ **Kesimpulan (Late Fusion):** AI tidak akan menjadi *Black Box*. Ia memprediksi disleksia dengan argumen matematis, misalnya skor **Kepadatan Tinta** yang abnormal tinggi (akibat *over-tracing*) atau **Transisi Garis (Tremor)** yang masif.")
+        
+    st.divider()
+    
+    st.info("#### 🤔 Pertanyaan Bisnis 4\n*Bagaimana sistem dapat memberikan interpretasi klinis (Sub-tipe) terhadap hasil klasifikasinya?*")
+    st.image(f'{img_folder}/xai_kde_subtypes{img_suffix}', width='stretch')
+    st.success("✅ **Kesimpulan (Profiling):** AI mampu memisahkan Sub-tipe Disleksia! Tipe *Corrected* mendominasi di wilayah Kepadatan Tinta (kanan), sedangkan tipe *Reversal* terdeteksi akurat melalui anomali pada metrik Simetri Horizontal.")
+
+# ==========================================
+# TAB 4: DATA PREP & STRATIFICATION
+# ==========================================
+with tab4:
     st.markdown("### ⚖️ Balancing & Kategori Data")
     
     if dataset_choice == "Dataset Dengan Augmentasi (Gambo + EMNIST)":
@@ -232,12 +172,19 @@ with tab3:
             st.error("**Before:** Imbalance Dataset\n- Dyslexia: ~115,000\n- Normal: ~58,000")
         with col2:
             st.success("**After:** Balanced (~1:1 Ratio)\n- Dyslexia (Gambo): ~142,000\n- Normal (Gambo + EMNIST): ~131,000")
+            
+        st.info("#### 🤔 Pertanyaan Bisnis 1\n*Apakah dataset gabungan (EMNIST + Gambo) sudah cukup representatif dan seimbang untuk melatih model AI?*")
+        st.success("✅ **Kesimpulan:** Ya, sangat seimbang! Penambahan dataset EMNIST berhasil menekan rasio kelas secara masif hingga mendekati **1:1**. Model AI yang akan kita latih dijamin tidak akan mengalami penyakit *Majority Class Bias*.")
+            
     else:
         st.write("Dataset ini merupakan versi murni dari Gambo tanpa tambahan sintesis dari EMNIST.")
         if df_master is not None:
             dys_count = len(df_master[df_master['target_class'] == 1])
             norm_count = len(df_master[df_master['target_class'] == 0])
             st.info(f"**Komposisi Saat Ini:** Terdapat **{dys_count:,}** sampel tulisan Disleksia dan **{norm_count:,}** sampel tulisan Normal.")
+            
+        st.warning("#### 🤔 Pertanyaan Bisnis 1\n*Apakah dataset ini sudah seimbang untuk melatih model AI?*")
+        st.error("⚠️ **Kesimpulan:** Belum. Dataset asli ini masih sangat rentan terhadap *Class Imbalance*, di mana tulisan Disleksia jauh mendominasi. Risiko terjadinya *Majority Class Bias* saat pelatihan sangat tinggi.")
         
     if df_master is not None:
         st.divider()
@@ -279,9 +226,9 @@ with tab3:
                 plt.close(fig)
 
 # ==========================================
-# TAB 4: DATASET VIEWER (COMPRESSED CSV)
+# TAB 5: DATASET VIEWER (COMPRESSED CSV)
 # ==========================================
-with tab4:
+with tab5:
     st.markdown("### 👁️ Eksplorasi Data (Compressed CSV)")
 
     is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
