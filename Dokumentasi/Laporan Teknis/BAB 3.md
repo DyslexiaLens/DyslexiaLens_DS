@@ -15,10 +15,10 @@ Proses *filtering* diinisiasi dengan 7 ekspresi reguler (Regex) digabungkan deng
 | No. | Mekanisme / Filter | Pola / Kondisi | Target Anomali |
 |---|---|---|---|
 | 1 | `OS Path Validation` | `os.path.exists()` | Pencegahan *Broken Links* (file korup yang tercatat namun hilang dari *hard disk*) |
-| 2 | `RE_DUPLICATE_WIN` | `(\d+)` | File duplikat hasil *copy-paste* Windows (misal: `Normal1305 (11).png`) |
-| 3 | `RE_PLACEHOLDER` | `^(Normal\|Reversal\|Corrected).png$` | File *placeholder* tanpa ID yang bukan gambar tulisan tangan asli |
-| 4 | `RE_GLITCH` | `.qNcy` | File *glitch* dari *download* terputus dengan ekstensi ganda |
-| 5 | `RE_ALPHA_ONLY` | `^[A-Za-z].png$` | File referensi abjad tunggal (misal: `A.png`, `b.png`) |
+| 2 | `RE_DUPLICATE_WIN` | `\(\d+\)` | File duplikat hasil *copy-paste* Windows (misal: `Normal1305 (11).png`) |
+| 3 | `RE_PLACEHOLDER` | `^(Normal\|Reversal\|Corrected)\.png$` | File *placeholder* tanpa ID yang bukan gambar tulisan tangan asli |
+| 4 | `RE_GLITCH` | `\.qNcy` | File *glitch* dari *download* terputus dengan ekstensi ganda |
+| 5 | `RE_ALPHA_ONLY` | `^[A-Za-z]\.png$` | File referensi abjad tunggal (misal: `A.png`, `b.png`) |
 | 6 | `RE_NORMAL_NUMBER` | `^Normal\d+` | File `Normal_XXX.png` yang anomali/terseret **di dalam folder Normal** |
 | 7 | `RE_REVERSAL_NUMBER` | `^Reversal\d+` | File `Reversal_XXX.png` tanpa metrik keparahan yang valid |
 | 8 | `RE_STARTS_WITH_ALPHA` | `^[A-Za-z][-_.]` | File dengan format huruf yang menyimpang di folder `Corrected`/`Reversal` |
@@ -65,7 +65,7 @@ Hasil akhir proses cleaning logis adalah file `master_dataset_dyslexia.csv` deng
 
 > ⚠️ **Skenario Pemodelan & Pencegahan Data Leakage Kelas Berat:** 
 > 1. **Penyatuan Biner vs Multi-Class:** Kolom `target_class` memampatkan `Corrected` dan `Reversal` menjadi kelas `1` murni untuk membangun *baseline screening* (Sehat vs Sakit). Namun, identitas medis yang krusial tetap dikuantifikasi secara ordinal pada kolom `severity_score` (Skor 6 untuk Reversal, 1-5 untuk Corrected) guna melayani skenario model *Multi-class Classification* ke depannya.
-> 2. **Bahaya Nama File:** Kolom `severity_score`, `folder_category`, dan **bahkan nama file itu sendiri (`file_name`)** mengandung label (*ground truth*). Keempatnya **diharamkan masuk sebagai fitur**. String *path* murni hanya boleh digunakan sebagai *pointer* pemuatan piksel (`cv2.imread`).
+> 2. **Bahaya Nama File:** Kolom `severity_score`, `folder_category`, dan **bahkan nama file itu sendiri (`file_name`)** mengandung label (*ground truth*). Ketiganya **diharamkan masuk sebagai fitur**. String *path* murni hanya boleh digunakan sebagai *pointer* pemuatan piksel (`cv2.imread`).
 > 3. **Distrust pada Split Bawaan:** Kolom `split` (Train/Test) tetap dipertahankan sekadar untuk referensi komparasi. AI Engineer sangat direkomendasikan mengabaikan split bawaan ini karena potensi ketidakseimbangannya, dan wajib melakukan *Stratified Shuffle Split* atau *K-Fold Cross Validation* ulang dari nol dengan *random seed* yang deterministik.
 
 > 🖼️ **[SUGESTI VISUAL 2]**
@@ -80,6 +80,7 @@ Setelah cetak biru logis (Master CSV) terbentuk, intervensi fisik *hard disk* di
 
 ### A. Sinkronisasi Folder Dataset
 File `.png` yang **tidak memiliki record di dalam CSV** (karena terkena `DROP` atau Regex) dianggap sebagai sampah (*noise*) dan dihapus secara fisik untuk menghemat ruang.
+Sebagai implementasi *Defensive Programming*, eksekusi penghapusan ini dilindungi oleh mekanisme `DRY_RUN = True`. Skrip akan mencetak simulasi target file ke terminal untuk diverifikasi manusia, sebelum akhirnya sakelar diubah menjadi `DRY_RUN = False` untuk melakukan penghapusan permanen di level OS.
 
 ### B. Penghapusan Anomali *Inverted Background / Overexposed*
 Satu filter tambahan berbasis *Computer Vision* diterapkan: menghapus gambar dengan `mean_pixel > 127`. Mengingat standar dataset tulisan tangan AI (seperti MNIST) didominasi latar hitam (piksel 0), gambar dengan *mean* di atas 127 mengindikasikan anomali **Inverted Background** (latar putih, tulisan hitam) atau keberadaan **artefak bercak putih raksasa** (*overexposed*). Memasukkan citra dengan polaritas warna yang terbalik ini akan merusak filter konvolusi CNN.
