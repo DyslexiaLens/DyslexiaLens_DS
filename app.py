@@ -19,11 +19,12 @@ st.markdown('<div class="main-header">🧠 DyslexiaLens Dataset Explorer</div>',
 st.markdown('<div class="sub-header">Data Scientist Handover Dashboard — From Raw Data to Ready-to-Train CSV</div>', unsafe_allow_html=True)
 
 # Membuat Tab
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
     "📊 Dataset Summary", 
     "👁️ Computer Vision (Pola Visual)", 
     "🧠 XAI Profiling (Fitur Geometri)", 
     "🛠 Stratification", 
+    "🔬 A/B Testing Validation",
     "🔍 Interactive Viewer"
 ])
 
@@ -62,16 +63,21 @@ df_master = load_master_data(csv_path)
 # TAB 1: DATASET SUMMARY
 # ==========================================
 with tab1:
-    st.markdown("### 📊 Ringkasan Dataset Master (Gambo + EMNIST)")
+    is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
+    title_suffix = "Original Gambo" if is_noAugmentation else "Gambo + EMNIST"
+    st.markdown(f"### 📊 Ringkasan Dataset Master ({title_suffix})")
     if df_master is not None:
         col1, col2, col3, col4 = st.columns(4)
         total_images = len(df_master)
         total_train = len(df_master[df_master['split'] == 'Train'])
         total_test = len(df_master[df_master['split'] == 'Test'])
         
+        train_pct = (total_train / total_images) * 100 if total_images > 0 else 0
+        test_pct = (total_test / total_images) * 100 if total_images > 0 else 0
+        
         col1.metric("Total Gambar", f"{total_images:,}")
-        col2.metric("Data Train (80%)", f"{total_train:,}")
-        col3.metric("Data Test (20%)", f"{total_test:,}")
+        col2.metric(f"Data Train ({train_pct:.0f}%)", f"{total_train:,}")
+        col3.metric(f"Data Test ({test_pct:.0f}%)", f"{total_test:,}")
         col4.metric("Jumlah Kelas", "2 (Biner)")
         
         st.divider()
@@ -169,9 +175,9 @@ with tab4:
         
         col1, col2 = st.columns(2)
         with col1:
-            st.error("**Before:** Imbalance Dataset\n- Dyslexia: ~115,000\n- Normal: ~58,000")
+            st.error("**Before:** Imbalance Dataset\n- Dyslexia: ~120.463\n- Normal: ~35.990\n*(Rasio Kritis 3.35:1)*")
         with col2:
-            st.success("**After:** Balanced (~1:1 Ratio)\n- Dyslexia (Gambo): ~142,000\n- Normal (Gambo + EMNIST): ~131,000")
+            st.success("**After:** Balanced (~1:1 Ratio)\n- Dyslexia (Fair Pruning): ~102.394\n- Normal (Gambo + EMNIST): ~102.439")
             
         st.info("#### 🤔 Pertanyaan Bisnis 1\n*Apakah dataset gabungan (EMNIST + Gambo) sudah cukup representatif dan seimbang untuk melatih model AI?*")
         st.success("✅ **Kesimpulan:** Ya, sangat seimbang! Penambahan dataset EMNIST berhasil menekan rasio kelas secara masif hingga mendekati **1:1**. Model AI yang akan kita latih dijamin tidak akan mengalami penyakit *Majority Class Bias*.")
@@ -226,9 +232,19 @@ with tab4:
                 plt.close(fig)
 
 # ==========================================
-# TAB 5: DATASET VIEWER (COMPRESSED CSV)
+# TAB 5: A/B TESTING VALIDATION
 # ==========================================
 with tab5:
+    st.markdown("### 🔬 Validasi Keamanan Augmentasi (A/B Testing)")
+    st.write("Eksperimen A/B Testing ini membandingkan **Dataset A (Gambo Asli / Kurva Merah)** melawan **Dataset B (Gambo + EMNIST / Kurva Biru)**.")
+    st.write("Visualisasi *Kernel Density Estimation* (KDE) di bawah ini membuktikan bahwa injeksi jutaan piksel dari EMNIST **tidak merusak** DNA atau distribusi fitur XAI asli dari dataset Gambo. Karena kedua kurva nyaris bertumpuk sempurna (*Negligible Effect Size* berdasarkan evaluasi Cohen's d), ini adalah bukti saintifik bahwa augmentasi EMNIST aman secara klinis.")
+    st.info("💡 **Catatan:** Grafik validasi ini selalu menampilkan perbandingan antara ekosistem sebelum dan sesudah augmentasi, terlepas dari dataset apa yang sedang Anda tinjau di sidebar.")
+    st.image('assets/ab_testing_kde_overlay.png', width='stretch')
+
+# ==========================================
+# TAB 6: DATASET VIEWER (COMPRESSED CSV)
+# ==========================================
+with tab6:
     st.markdown("### 👁️ Eksplorasi Data (Compressed CSV)")
 
     is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"

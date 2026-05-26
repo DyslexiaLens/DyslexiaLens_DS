@@ -101,11 +101,11 @@
 
 ### 7. Dashboard Streamlit
 
-- [ ] Merancang layout dashboard (halaman apa saja yang diperlukan)
-- [ ] Membangun halaman **Overview Distribusi Dataset** (bar chart, statistik ringkas)
-- [ ] Membangun halaman **Visualisasi Sampel** (tampilkan gambar per kelas dan skor)
-- [ ] Membangun halaman **Insight EDA** (grafik explanatory + narasi)
-- [ ] Menjalankan dashboard secara lokal dan melakukan pengujian fungsional
+- [x] Merancang layout dashboard (halaman apa saja yang diperlukan)
+- [x] Membangun halaman **Overview Distribusi Dataset** (bar chart, statistik ringkas)
+- [x] Membangun halaman **Visualisasi Sampel** (tampilkan gambar per kelas dan skor)
+- [x] Membangun halaman **Insight EDA** (grafik explanatory + narasi)
+- [x] Menjalankan dashboard secara lokal dan melakukan pengujian fungsional
 
 ---
 
@@ -128,10 +128,11 @@
 
 ---
 
-- [ ] **Feature Engineering** — Menghasilkan fitur turunan yang lebih informatif dari data gambar (misalnya: kepadatan piksel per kuadran, rasio hitam-putih, dll.)
-- [ ] **Deployment Dashboard Streamlit Cloud** — Mempublikasikan dashboard agar dapat diakses secara online
-- [ ] **A/B Testing** — Membandingkan dua pendekatan preprocessing/augmentasi menggunakan metode A/B Testing dengan Python
-- [ ] **Laporan Teknis Komprehensif (PDF)** — Menyusun laporan dari tahap *Problem Discovery* hingga hasil akhir dalam format PDF
+- [x] **Feature Engineering (XAI)** — Menghasilkan 6 fitur turunan (ink_density, center_of_mass_x, center_of_mass_y, bounding_box_ratio, horizontal_symmetry, stroke_transitions) sebagai basis Explainable AI.
+- [x] **Deployment Dashboard Streamlit Cloud** — Dashboard berhasil dipublikasikan dan dapat diakses secara online. ✅ *Selesai 19 Mei 2026*
+- [ ] **A/B Testing** — Mengeksekusi pengujian A/B sesuai *Plan* baru: Opsi A (Uji Integritas Data via Mann-Whitney) secara mandiri, atau Opsi B (Uji Performa Model via McNemar) secara kolaboratif.
+- [ ] **Persiapan Sesi Mentoring Advisor** — Mengisi Dokumen Advisor Project Manager dan menyusun bahan presentasi (Dashboard & Temuan).
+- [ ] **Laporan Teknis Komprehensif (PDF)** — Menyusun Technical Report yang komprehensif berisi langkah analisis, evidence, citation, kesimpulan, dan rekomendasi action item.
 
 ---
 

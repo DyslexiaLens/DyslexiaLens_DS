@@ -28,8 +28,48 @@ Dokumen ini melacak eksekusi dari rencana yang disusun sebelumnya pada dokumen `
 
 ---
 
-### 🔄 4. Pelaksanaan A/B/C Testing Dataset
-**Status:** Masih dalam proses (In Progress)
+### 🔄 4. Pelaksanaan A/B Testing Dataset
+**Status:** Masih dalam proses (In Progress) — Terdapat dua opsi *pipeline* eksekusi (A dan B) sesuai kesiapan tim AI Engineer.
 
-### 🔄 5. Deployment Dashboard ke Cloud
-**Status:** Masih dalam proses (In Progress)
+#### Dua Jalur Pengujian
+Sesuai rancangan pada `DyslexiaLens_AB_Testing_Plan.md`, pengujian dipisah menjadi dua opsi:
+- **Opsi A (Fokus Integritas Data):** Dieksekusi **mandiri oleh Data Scientist** menggunakan *Mann-Whitney U Test*.
+- **Opsi B (Fokus Performa Model):** Dieksekusi secara **kolaboratif** jika AI Engineer sudah berhasil melatih dua model (*baseline* vs EMNIST). Menguji akurasi menggunakan *McNemar Test*.
+
+**Langkah Terdekat:** Mengeksekusi **Opsi A** (Uji Mann-Whitney) pada *Jupyter Notebook* karena datanya sudah siap 100%.
+
+#### Rincian Eksekusi Opsi A (Mandiri oleh DS)
+Yang dibandingkan pada langkah ini adalah **karakteristik statistik dua dataset** yang sudah tersedia.
+
+| | Dataset A (Kontrol) | Dataset B (Perlakuan) |
+|---|---|---|
+| **File** | `master_dataset_final_balanced_rill_featured.csv` | `master_dataset_emnist_balanced_final_featured.csv` |
+| **Sumber** | Gambo saja (~180k) | Gambo + EMNIST (~273k) |
+
+**Perumusan Hipotesis (Opsi A)**
+- **H₀:** Tidak ada perbedaan signifikan pada distribusi 6 fitur XAI antara Dataset A dan Dataset B.
+- **H₁:** Ada perbedaan signifikan — augmentasi EMNIST mengubah karakteristik data secara nyata.
+- **Alpha (α):** 0.05
+
+**Metrik yang Dibandingkan**
+Enam fitur XAI yang sudah diekstrak di tahap Feature Engineering:
+`ink_density`, `center_of_mass_x`, `center_of_mass_y`,
+`bounding_box_ratio`, `stroke_transitions`, `horizontal_symmetry`
+
+**Uji Statistik: Mann-Whitney U Test (Non-Parametrik)**
+Dipilih karena distribusi fitur gambar tidak bisa diasumsikan normal. Membandingkan dua grup independen (Dataset A vs Dataset B) untuk setiap fitur.
+
+#### SOP Eksekusi A/B Testing
+1. Load kedua CSV featured ke notebook
+2. Jalankan Mann-Whitney U Test (Opsi A) untuk masing-masing dari 6 fitur
+3. Buat tabel ringkasan P-value per fitur
+4. Visualisasikan perbandingan distribusi (boxplot / violin plot)
+5. Tulis interpretasi & rekomendasi untuk Technical Report
+6. Tampilkan di Dashboard Streamlit (tab A/B Testing)
+7. *(Cadangan)* Jika model AI sudah siap sebelum deadline, jalankan *McNemar Test* (Opsi B).
+
+> 📄 Detail metodologi, kode Python, dan aturan keputusan lengkap tersedia di:
+> `Dokumentasi/Referensi/Rainy/DyslexiaLens_AB_Testing_Plan.md`
+
+### ✅ 5. Deployment Dashboard ke Cloud
+**Status:** Selesai — Dashboard berhasil dideploy ke Streamlit Cloud
