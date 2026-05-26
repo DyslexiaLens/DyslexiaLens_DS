@@ -10,11 +10,11 @@ Langkah pertama adalah membangun "saringan" berbasis logika untuk memisahkan dat
 
 ### A. Sistem Penyaringan Lapis Pertama (Regex & OS Validation)
 
-Proses *filtering* diinisiasi dengan 7 ekspresi reguler (Regex) digabungkan dengan **Validasi Sistem Operasi**.
+Proses *filtering* diinisiasi dengan **8 saringan logika** yang menggabungkan ekspresi reguler (Regex) dengan validasi sistem file.
 
 | No. | Mekanisme / Filter | Pola / Kondisi | Target Anomali |
 |---|---|---|---|
-| 1 | `OS Path Validation` | `os.path.exists()` | Pencegahan *Broken Links* (file korup yang tercatat namun hilang dari *hard disk*) |
+| 1 | `File Integrity Validation` | `os.path.exists()` & `Image.open()` | Pencegahan *Broken Links* dan file rusak (tidak terbaca oleh pustaka pembuat gambar) |
 | 2 | `RE_DUPLICATE_WIN` | `\(\d+\)` | File duplikat hasil *copy-paste* Windows (misal: `Normal1305 (11).png`) |
 | 3 | `RE_PLACEHOLDER` | `^(Normal\|Reversal\|Corrected)\.png$` | File *placeholder* tanpa ID yang bukan gambar tulisan tangan asli |
 | 4 | `RE_GLITCH` | `\.qNcy` | File *glitch* dari *download* terputus dengan ekstensi ganda |
@@ -45,10 +45,9 @@ Selanjutnya, fungsi memetakan ulang skor keparahan agar searah dengan urgensi kl
 | `1` (Reversal) | Goresan hancur / *letter reversal* | Paling Parah | → | `6` (digabung) |
 | `Normal` | Tulisan bersih tanpa gejala | Normal | → | `0` |
 
-Secara rekayasa data, *pipeline* `get_score()` dirancang sangat tangguh (*robust*). Fungsi ini mampu memproses nama file mentah (contoh: `9_23.png`) maupun nama file yang telah direkayasa ulang sebelumnya melalui skrip *Physical Renaming* opsional (`1_23.png`).
-
-Skor keparahan dipetakan ulang agar searah dengan urgensi klinis (nilai 1 = paling ringan, 6 = paling parah). 
-Secara rekayasa data, fungsi *parsing delimiter* (`_` dan `-`) sengaja dibuat sangat kaku (*strict*). Jika sebuah file memiliki suffix ganda yang ambigu (misal `9-23_baru.png`), sistem akan langsung menggagalkan *parsing* dan melabelinya `DROP` sebagai bentuk perlindungan dari data *corrupt*. Selain itu, *pipeline* bersifat idempoten; ia mampu memproses nama file mentah maupun file yang telah melalui skrip opsional *Physical Renaming* secara konsisten.
+Secara rekayasa data, *pipeline* `get_score()` dirancang dengan dua prinsip utama:
+- **Ketatnya Parsing:** Fungsi *parsing delimiter* (`_` dan `-`) sengaja dibuat sangat kaku (*strict*). Jika sebuah file memiliki suffix ganda yang ambigu (misal `9-23_baru.png`), sistem akan langsung menggagalkan *parsing* dan melabelinya `DROP` sebagai bentuk perlindungan dari data *corrupt*.
+- **Idempotensi:** Pipeline mampu memproses nama file mentah (contoh: `9_23.png`) maupun file yang telah melalui skrip opsional *Physical Renaming* (`1_23.png`) secara konsisten tanpa efek samping.
 
 ### C. Output: Definisi Kolom Master CSV
 
@@ -84,6 +83,11 @@ Sebagai implementasi *Defensive Programming*, eksekusi penghapusan ini dilindung
 
 ### B. Penghapusan Anomali *Inverted Background / Overexposed*
 Satu filter tambahan berbasis *Computer Vision* diterapkan: menghapus gambar dengan `mean_pixel > 127`. Mengingat standar dataset tulisan tangan AI (seperti MNIST) didominasi latar hitam (piksel 0), gambar dengan *mean* di atas 127 mengindikasikan anomali **Inverted Background** (latar putih, tulisan hitam) atau keberadaan **artefak bercak putih raksasa** (*overexposed*). Memasukkan citra dengan polaritas warna yang terbalik ini akan merusak filter konvolusi CNN.
+
+> ⚠️ **Catatan Penanganan Image Mode:** Sebelum nilai rata-rata piksel dihitung, seluruh file gambar secara wajib dikonversi ke mode Grayscale (`L`, rentang piksel 0–255). Langkah ini krusial untuk mencegah kegagalan deteksi pada gambar yang memiliki mode bawaan Binary (`1`), yang mana nilai piksel maksimalnya hanya `1` sehingga tidak akan pernah terdeteksi oleh ambang batas 127.
+>
+> 🛡️ **Pertahanan Desain Filter:** Ambang batas `mean > 127` dipilih secara konservatif. Pada praktiknya, tulisan tangan anak di atas latar hitam 28×28 piksel nyaris tidak mungkin melampaui *mean* 127 secara organik, mengingat area *foreground* (goresan putih) umumnya hanya menempati ~15–25% total kanvas. Risiko filter ini "salah bunuh" data disleksia yang valid secara klinis adalah mendekati nol.
+
 *(Catatan Batasan: Filter ini sangat efektif membunuh anomali putih, namun belum dirancang untuk menangkap anomali gambar hitam pekat buta (`mean_pixel < 5`). Anomali tersebut ditangguhkan pada tahap inspeksi visual EDA).*
 
 ### C. Rebuilding Master CSV (Anti-Ghost Records)
@@ -99,6 +103,8 @@ Langkah B (penghapusan fisik gambar anomali putih) menyebabkan CSV memiliki **Gh
 | **B** | Sinkronisasi Folder (Hapus fisik non-CSV) | ✅ Selesai |
 | **C** | Penghapusan Anomali Polaritas Putih (`mean_pixel > 127`) | ✅ Selesai |
 | **D** | Rebuild `master_dataset_dyslexia.csv` Final | ✅ Selesai |
+
+**Hasil Akhir:** Dari **208.372 gambar mentah** yang tercatat pada audit awal (Bab 2), *pipeline cleaning* berhasil menyelamatkan **~156.453 gambar bersih** ke dalam Master CSV final. Selisih ~52.000 file merupakan akumulasi eliminasi dari Label Noise, duplikat Windows, *placeholder*, file *glitch*, anomali *Inverted Background*, dan baris yang gagal *parsing* `severity_score`.
 
 > 🖼️ **[SUGESTI VISUAL 3]**
 > *Tempatkan screenshot log terminal yang menampilkan RINGKASAN KUANTITATIF (Berapa file terhapus oleh get_score, OS Validation, dan BERAPA TOTAL FILE BERSIH yang selamat).*

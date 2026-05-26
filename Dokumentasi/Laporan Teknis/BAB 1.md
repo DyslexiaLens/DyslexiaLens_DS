@@ -24,3 +24,29 @@ Rangkaian eksperimen Data Science dalam proyek ini didesain untuk menjawab empat
    *(Fokus: Mengembangkan 6 fitur matematis / XAI sebagai pondasi transparansi interpretasi pola).*
 4. **Bagaimana merekonstruksi dan mengamankan metrik keparahan (*Severity Score*) bawaan yang anomali agar layak menjadi target prediksi?**
    *(Fokus: Memastikan *pipeline* mendefinisikan label target yang bersih dan logis, sehingga model kelak mampu mendeteksi tingkat keparahan disleksia secara berjenjang).*
+
+## 1.4 Batasan Proyek (*Scope Limitation*)
+
+Untuk menjaga ekspektasi pembaca dan mencegah *scope creep*, berikut adalah batasan eksplisit dari laporan ini:
+
+| Termasuk dalam Scope | TIDAK Termasuk dalam Scope |
+|---|---|
+| Audit, pembersihan, dan rekonstruksi dataset | Pelatihan dan evaluasi model AI (tanggung jawab AI Engineer) |
+| Ekstraksi 6 fitur XAI matematis | Pengembangan arsitektur CNN/Deep Learning |
+| Strategi augmentasi & validasi statistik (A/B Testing) | Deployment model ke aplikasi produksi |
+| Penyiapan *handover* dataset final | Uji klinis atau validasi medis terhadap pasien nyata |
+| Terbatas pada aksara Latin (A–Z) | Aksara non-Latin (misal: Arab, Mandarin, Cyrillic) |
+
+> ⚠️ **Disclaimer Medis:** Sistem DyslexiaLens adalah alat **skrining awal (*early screening*)**, bukan alat diagnosis medis definitif. Seluruh temuan dalam laporan ini bersifat komputasional dan wajib dikonfirmasi oleh profesional klinis sebelum digunakan sebagai dasar intervensi medis.
+
+## 1.5 Peta Jalan Laporan
+
+| Bab | Judul | Fokus Utama |
+|---|---|---|
+| **2** | Audit & Profiling Dataset | Membongkar anomali bawaan dataset Gambo |
+| **3** | Pembersihan & Rekayasa Data | Membangun Master CSV sebagai *single source of truth* |
+| **4** | Feature Engineering (XAI) | Mengekstrak 6 fitur matematis bermakna klinis |
+| **5** | EDA & Dashboarding | Menjawab Pertanyaan Bisnis dengan bukti visual |
+| **6** | Augmentasi & A/B Testing | Memvalidasi keamanan injeksi EMNIST secara statistik |
+| **7** | Penyiapan Data Final | Stratified Split, Data Dictionary, dan *handover* |
+| **8** | Kesimpulan & *Action Items* | Rangkuman temuan dan mandat untuk AI Engineer |

@@ -2,7 +2,7 @@
 
 > Bagian Data Science dari Capstone Project **DyslexiaLens**: Intelligent Handwriting Detection and Assistance for Dyslexia.
 >
-> Repositori ini berisi seluruh proses kerja Data Scientist, mulai dari eksplorasi dan audit dataset, pembersihan data (*Data Wrangling*), pemecahan masalah *Class Imbalance* menggunakan injeksi eksternal (**EMNIST**), perumusan fitur *Explainable AI* (XAI), hingga pembuatan *Streamlit Executive Dashboard*.
+> Repositori ini berisi seluruh proses kerja Data Scientist, mulai dari eksplorasi dan audit dataset, pembersihan data (*Data Wrangling*), pemecahan masalah *Class Imbalance* menggunakan injeksi eksternal (**EMNIST**), validasi keamanan menggunakan uji statistik (**A/B Testing**), perumusan fitur *Explainable AI* (XAI), hingga pembuatan *Streamlit Executive Dashboard*.
 
 ---
 
@@ -15,11 +15,12 @@ Pada repositori ini, fokus utama adalah membangun **Pondasi Data yang Kokoh** da
 | Detail | Keterangan |
 |---|---|
 | **Tema** | Accessible & Adaptive Learning |
-| **Fokus Utama** | Data Engineering, Feature Engineering (XAI), & Dashboarding |
+| **Fokus Utama** | Data Engineering, Feature Engineering (XAI), MLOps Preparation & Dashboarding |
 | **Dataset Primer** | Gambo (Handwriting Dyslexia Dataset) |
 | **Dataset Sekunder** | EMNIST (Digunakan untuk injeksi ekuilibrium kelas Normal) |
-| **Total Sampel (Balanced)** | ~273.000 gambar (Rasio 1:1 Normal vs Disleksia) |
+| **Total Sampel (Balanced)** | ~204.833 gambar (Rasio 1:1 Normal vs Disleksia) |
 | **Aplikasi Presentasi** | Streamlit Interactive Dashboard (`app.py`) |
+| **Dokumentasi Final** | Laporan Teknis/Final.md (SLA Handover to AI Engineer) |
 
 ---
 
@@ -29,8 +30,8 @@ Pada repositori ini, fokus utama adalah membangun **Pondasi Data yang Kokoh** da
 Dataset Disleksia/
 │
 ├── 📊 app.py                       # Streamlit Executive Dashboard (UI/UX)
-├── 📁 assets/                      # Aset visual EDA untuk Streamlit
-│   ├── EMNIST/                     # Grafik dataset augmentasi
+├── 📁 assets/                      # Aset visual EDA untuk Streamlit & Laporan
+│   ├── EMNIST/                     # Grafik dataset augmentasi & A/B Testing
 │   └── noAugmentation/             # Grafik dataset murni
 │
 ├── 📁 csv_metadata/                # Output tabular final (Siap Training!)
@@ -38,37 +39,49 @@ Dataset Disleksia/
 │   └── dyslexialens_test_EMNIST.csv.gz (Compressed Pixel Viewer)
 │
 ├── 📁 notebooks/
+│   ├── 📓 AB_Testing.ipynb         # Notebook validasi A/B Testing
 │   ├── 📓 Dyslexia_EMNIST.ipynb    # Notebook utama pipeline EMNIST
 │   ├── 📓 Dyslexia_NoAugment.ipynb # Notebook utama pipeline murni
+│   ├── 📓 EMNIST_to_Gambo.ipynb    # Notebook penggabungan dataset EMNIST dan Gambo
 │
-├── 📁 Python Stuff/                # Script utilitas Python (Legacy)
-└── 📁 Dokumentasi/                 # Catatan diskusi dan audit historis
+├── 📁 Dokumentasi/Laporan Teknis/  # 🌟 SINGLE SOURCE OF TRUTH DOKUMENTASI
+│   └── 📑 Final.md                 # Gabungan utuh BAB 1 - BAB 8 (SLA Kontrak)
 ```
 
 ---
 
-## 🔬 Alur Kerja Data Science (Pipeline)
+## 🔬 Alur Kerja Data Science (Berdasarkan Laporan Teknis)
 
-### Tahap 1 — Audit Kritis & Normalisasi
-Ditemukan dua anomali kritis pada dataset publik Gambo:
-1. **Sistem Severity Score Terbalik:** Folder numerik (`1-9`) ternyata bukan karakter angka, melainkan skala keparahan tulisan. Kami menormalisasinya menjadi skala linear `0` (Normal) hingga `6` (Paling Parah).
-2. **Kontaminasi Label:** Ditemukan file `NormalXXXX.png` yang terselip di dalam folder disleksia. Masalah ini diselesaikan melalui *Logical Cleaning* menggunakan metode *Boolean Masking* di Pandas.
+Seluruh pengerjaan pada repositori ini terdokumentasi rapi di dalam file **`Dokumentasi/Laporan Teknis/Final.md`** yang memuat 8 Bab utama:
 
-### Tahap 2 — Resolusi "Class Imbalance"
-Dataset murni Gambo memiliki ketimpangan ekstrem di mana kelas *Disleksia* jauh lebih banyak dari *Normal*.
-*   **Solusi:** Kami melakukan injeksi data dari dataset eksternal (**EMNIST**) secara deterministik menggunakan algoritma *Fair Pruning* (Top-Down Indexing).
-*   **Hasil:** Tercapai titik ekuilibrium **1:1** (~142.000 Disleksia vs ~131.000 Normal), sehingga mencegah model AI dari kerentanan *Majority Class Bias*.
+### Bab 2 & 3 — Audit & Logical Cleaning
+Ditemukan 3 anomali kritis pada dataset publik Gambo:
+1. **Class Imbalance:** Rasio 3.35:1 (Disleksia sangat mendominasi).
+2. **Label Noise:** Ratusan data Normal tersesat di folder Disleksia (dan sebaliknya) yang dibersihkan via Pandas.
+3. **Sistem Severity Score Cacat:** Skala asli (9=Ringan, 1=Parah) dibalik, dan skor ekstrem (4 dan 1) digabungkan menjadi skor **6 (Paling Parah)** guna menjaga kontinuitas Ordinal (0=Normal, 1-6=Ringan-Parah).
 
-### Tahap 3 — Feature Engineering (Membangun XAI)
-Untuk memastikan arsitektur *Late Fusion CNN* kelak memiliki kemampuan **Explainable AI (XAI)**, kami mengekstrak 5 fitur matematis-geometri dari setiap matriks 28x28 piksel:
-1.  `ink_density`: Mendeteksi indikasi *Over-tracing* (coretan ragu-ragu/berulang).
-2.  `center_of_mass_x` & `y`: Mendeteksi pergeseran spasial ekstrem.
-3.  `bounding_box_ratio`: Mendeteksi distorsi proporsi dimensi huruf.
-4.  `stroke_transitions`: Menghitung frekuensi getaran/tremor motorik saat menulis.
-5.  `horizontal_symmetry`: Indikator pendeteksi utama untuk *Reversal* (tulisan terbalik).
+### Bab 4 — Feature Engineering (Membangun 6 Fitur XAI)
+Untuk memastikan arsitektur *Late Fusion CNN* kelak memiliki kemampuan **Explainable AI (XAI)**, kami mengekstrak 6 fitur matematis secara *stateless* (per gambar) agar terhindar dari *Data Leakage*:
+1. `stroke_density`: Mendeteksi *Over-tracing* (coretan ragu-ragu/berulang).
+2. `center_of_mass_x`: Distorsi spasial horizontal.
+3. `center_of_mass_y`: Distorsi spasial vertikal.
+4. `bounding_box_ratio`: Inkonsistensi proporsi huruf akibat kontrol motorik lemah.
+5. `stroke_transitions`: Menghitung frekuensi getaran (*tremor*) berupa garis bergerigi.
+6. `horizontal_symmetry`: Indikator klinis terkuat untuk disleksia orientasi (*Reversal/Mirroring*).
 
-### Tahap 4 — Executive Dashboarding
-Membuat aplikasi *Streamlit* untuk menjawab 4 Pertanyaan Bisnis utama secara interaktif dan mempresentasikan hasil *Computer Vision Analytics* (Heatmap) serta Profil Klinis (KDE Plots) kepada *stakeholders*.
+### Bab 5 — EDA & Dashboarding
+Membuktikan secara empiris (menggunakan *Variance Heatmap* dan *KDE Plot*) bahwa pola visual disleksia benar-benar nyata (inkonsistensi spasial tinggi) dan mampu membedakan sub-tipe disleksia (Corrected vs Reversal). Di-deploy dalam bentuk Streamlit.
+
+### Bab 6 — Strategi Augmentasi & A/B Testing
+Augmentasi spasial (seperti rotasi dan flip) **diharamkan** karena mengubah orientasi adalah gejala penyakit itu sendiri (huruf 'b' dirotasi jadi 'p').
+* **Solusi:** Injeksi data **EMNIST** dikombinasi algoritma *Fair Pruning* untuk mendowngrade mayoritas.
+* **Hasil:** Ekuilibrium rasio **1.00:1** (~102.394 Disleksia vs ~102.439 Normal).
+* **Validasi (A/B Testing):** Uji statistik *Mann-Whitney U* dan evaluasi *Cohen's d* membuktikan efek injeksi EMNIST bersifat *Negligible* (|d| < 0.2), menjamin DNA Gambo tidak rusak.
+
+### Bab 7 & 8 — Penyiapan Data & Action Items
+* Melakukan **Stratified Splitting (70/15/15)**.
+* Membangun **Data Dictionary**.
+* Merumuskan 3 Aturan Mutlak (*MUST NOT*) untuk AI Engineer (misal: dilarang menggunakan *MSE Loss* untuk memprediksi Severity Score karena sifatnya *Ordinal*).
 
 ---
 
@@ -80,23 +93,24 @@ Untuk mempresentasikan hasil pipeline ini secara interaktif, jalankan perintah b
 pip install streamlit pandas numpy matplotlib
 streamlit run app.py
 ```
-*Gunakan toggle di sidebar untuk melihat perbedaan analitik antara dataset Murni (No Augmentation) dan dataset Augmentasi (EMNIST).*
+*Gunakan toggle di sidebar untuk melihat perbedaan analitik antara dataset Murni (Gambo) dan dataset Augmentasi yang tervalidasi (Gambo + EMNIST).*
 
 ---
 
 ## 📋 Checklist Progres Akhir Data Scientist
 
-- [x] Eksplorasi dan audit anomali dataset `Gambo`
-- [x] Logical Cleaning & Normalisasi Skala Keparahan (1-6)
-- [x] Injeksi EMNIST & Algoritma Fair Pruning untuk Balancing (Rasio 1:1)
-- [x] Computer Vision Analytics (Variance & Difference Heatmaps)
-- [x] Feature Engineering 5 Variabel Matematis Geometri (XAI)
-- [x] Stratified Split Dataset (Train, Test) untuk mencegah Data Leakage
-- [x] Ekspor *Compressed Pixel CSV* (`.csv.gz`) untuk *viewer* statis
-- [x] Pembuatan Executive Dashboard interaktif dengan Streamlit
-- [x] Standardisasi Dokumentasi Markdown (*Handover Ready*)
+- [x] Eksplorasi dan audit anomali dataset `Gambo` (Bab 2)
+- [x] Logical Cleaning & Normalisasi Skala Keparahan Ordinal (Bab 3)
+- [x] Feature Engineering **6 Fitur** Matematis Geometri XAI (Bab 4)
+- [x] Computer Vision Analytics (Variance & Difference Heatmaps) (Bab 5)
+- [x] Injeksi EMNIST & Algoritma Fair Pruning untuk Balancing (Bab 6)
+- [x] Validasi Keamanan Augmentasi via **A/B Testing** KDE Overlay (Bab 6)
+- [x] Stratified Split (70/15/15) bebas Data Leakage (Bab 7)
+- [x] Ekspor *Compressed Pixel CSV* (`.csv.gz`) untuk memori dashboard efisien
+- [x] Pembuatan Executive Dashboard interaktif dengan Streamlit (Tab 1-5)
+- [x] Standardisasi Dokumentasi MLOps (*Final.md*) (Bab 8)
 
-**Status: 100% COMPLETE. SIAP DISERAHKAN KE TIM AI ENGINEER.**
+**Status: 100% COMPLETE. SLA KONTRAK DATA RESMI DISERAHKAN KE TIM AI ENGINEER.**
 
 ---
 

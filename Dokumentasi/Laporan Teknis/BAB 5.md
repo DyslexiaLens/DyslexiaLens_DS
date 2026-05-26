@@ -10,7 +10,7 @@ Tahap pertama EDA adalah mengonfirmasi kondisi kesehatan populasi data secara ku
 
 ### A. Keseimbangan Kelas (Class Imbalance Audit)
 
-Visualisasi *bar chart* mengonfirmasi kembali temuan audit Bab 2 dengan angka matematis yang kritis: populasi Disleksia (~115.000) berbanding Normal (~58.000). **Rasio ini menyentuh titik kritis ~2:1**. Dengan tingkat ketimpangan separah ini, model AI yang dilatih langsung pada data ini akan menderita *Majority Class Bias* (cenderung selalu menebak "Disleksia"). Kuantifikasi ini memberikan mandat mutlak untuk dilakukannya skenario augmentasi dataset.
+Visualisasi *bar chart* mengonfirmasi kembali temuan audit Bab 2 dengan angka matematis yang kritis: dari ~156.453 gambar bersih pasca-*cleaning* (Bab 3), populasi Disleksia (Corrected + Reversal) mendominasi hingga **~120.463 gambar**, sedangkan Normal hanya **~35.990 gambar**. **Rasio ini menyentuh titik kritis ~3.35:1** — sebuah ketimpangan separah ini menjamin bahwa model AI yang dilatih langsung pada data ini akan menderita *Majority Class Bias* (cenderung selalu menebak "Disleksia"). Kuantifikasi ini memberikan mandat mutlak untuk dilakukannya skenario augmentasi dataset.
 
 > 🖼️ **[SUGESTI VISUAL 1]**
 > *Tempatkan screenshot bar chart 'Keseimbangan Kelas: Normal vs Disleksia (Dataset Gambo Asli)' dari notebook EDA.*
