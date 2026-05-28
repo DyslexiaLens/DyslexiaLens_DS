@@ -51,26 +51,13 @@
 
 ## Team Challenges & Questions to Advisor
 
-### A. Terkait Laporan Teknikal & Dashboard
-
-1. Apakah *Technical Report* wajib menyertakan *snippet* kode teknis, atau cukup fokus pada narasi analisis dan visualisasinya saja?
-2. Adakah komponen interaktif spesifik di *Dashboard* yang dampaknya sangat besar pada nilai namun sering dilupakan peserta?
-
-### B. Terkait Pendekatan & Metodologi Data Science
-
-3. Apakah pemakaian dataset eksternal (EMNIST) untuk mengatasi *class imbalance* dinilai lebih baik daripada augmentasi sintetis?
-4. Apakah ekstraksi 6 fitur matematis ini sudah memadai untuk memenuhi standar *Explainable AI (XAI)*?
-5. Bagaimana metode terbaik membuktikan bahwa 6 fitur XAI ini benar-benar meningkatkan performa model akhir?
-6. Apakah *upscale* ekstrem gambar dari 28x28 menjadi 224x224 (demi *pre-trained model*) termasuk *overkill* atau lumrah?
-
-### C. Terkait A/B Testing (Prioritas Utama)
-
-7. Apakah uji beda distribusi fitur (Mann-Whitney) sah sebagai *A/B Testing*, atau Dicoding mutlak menuntut uji akurasi model (McNemar)?
-8. Jika hasil uji A/B ini signifikan, bagaimana cara terbaik menarasikan *business value*-nya di laporan?
-9. Jika hasilnya tidak signifikan, apakah eksperimen ini "gagal", atau justru membuktikan augmentasi EMNIST aman?
-10. Apakah format pelaporan *A/B Testing* dibebaskan, atau cukup lewat narasi visualisasi dan *P-value* di *notebook*?
-
-### D. Terkait Submission & Penilaian
-
-11. Area kelemahan *Data Science* apa yang dirasa paling kritis di proyek ini untuk segera diperbaiki?
-12. Apa saja kesalahan fatal (*common mistakes*) di tahap *Data Science* yang paling sering menyebabkan pengurangan nilai?
+1. Apakah Technical Report wajib menyertakan *snippet* kode teknis, atau cukup fokus pada narasi analisis dan visualisasinya saja?			
+2. Apakah pemakaian dataset eksternal (EMNIST) untuk mengatasi class imbalance dinilai lebih baik daripada augmentasi sintetis?			
+3. Apakah ekstraksi 6 fitur matematis ini sudah memadai untuk memenuhi standar Explainable AI (XAI)?			
+4. Bagaimana metode terbaik membuktikan bahwa 6 fitur XAI ini benar-benar meningkatkan performa model akhir?			
+5. Apakah upscale ekstrem gambar dari 28x28 menjadi 224x224 (demi pre-trained model) termasuk overkill atau lumrah?			
+6. Apakah uji beda distribusi fitur (Mann-Whitney) sah sebagai A/B Testing, atau Dicoding menuntut uji akurasi model (McNemar)?			
+7. Jika hasil uji A/B ini signifikan, bagaimana cara terbaik menarasikan business value-nya di laporan?			
+8. Jika hasilnya tidak signifikan, apakah eksperimen ini "gagal", atau justru membuktikan augmentasi EMNIST aman?			
+9. Apa saja kesalahan fatal (common mistakes) di tahap Data Science yang paling sering menyebabkan masalah fatal?			
+10. Area kelemahan Data Science apa yang dirasa paling kritis di proyek ini untuk segera diperbaiki?			

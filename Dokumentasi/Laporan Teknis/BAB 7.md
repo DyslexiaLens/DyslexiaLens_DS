@@ -114,10 +114,4 @@ Berikut adalah spesifikasi formal (**kontrak data**) dari file output utama `mas
 
 ---
 
-> 📌 **Kesimpulan Bab 7:**
-> Dataset telah melewati seluruh gerbang kualitas:
-> - **Stratified Split** menjamin representasi proporsional setiap level keparahan di seluruh partisi.
-> - **Zero Data Leakage** dibuktikan secara algoritmik di level *filename*.
-> - **Data Dictionary** memberikan kontrak formal yang mengikat AI Engineer agar tidak menyalahgunakan kolom terlarang, menormalisasi fitur raw, atau melakukan augmentasi spasial yang merusak diagnosis.
->
-> Dengan ini, seluruh tanggung jawab **Data Scientist** dalam *pipeline* DyslexiaLens dinyatakan **selesai**. Estafet resmi diserahkan kepada tim **AI Engineer** untuk memulai proses arsitektur model dan pelatihan. Rangkuman final seluruh temuan dan rekomendasi strategis akan dipaparkan di **Bab 8 (Kesimpulan & Handover)**.
+📌 **Kesimpulan Bab 7:** Dataset akhirnya telah berhasil melewati seluruh gerbang kualitas secara paripurna. Melalui proses *Stratified Split*, representasi proporsional setiap level keparahan di seluruh partisi dapat dijamin, dan protokol *Zero Data Leakage* telah dibuktikan secara ketat secara algoritmik di level *filename*. Kehadiran *Data Dictionary* turut mengunci integritas ini dengan memberikan kontrak formal yang mengikat tim AI Engineer agar tidak menyalahgunakan kolom terlarang, sembarangan menormalisasi fitur *raw*, atau melakukan augmentasi spasial yang berpotensi merusak diagnosis. Dengan pencapaian ini, seluruh tanggung jawab tim Data Scientist dalam *pipeline* hulu DyslexiaLens secara resmi dinyatakan selesai. Tongkat estafet kini sepenuhnya diserahkan kepada tim AI Engineer untuk memulai perancangan arsitektur dan pelatihan model. Rangkuman final mengenai seluruh temuan dan rekomendasi strategis akan dipaparkan di Bab 8 (Kesimpulan & Handover).

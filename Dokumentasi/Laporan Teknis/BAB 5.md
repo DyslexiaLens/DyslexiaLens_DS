@@ -130,5 +130,4 @@ Aplikasi ini tidak hanya tentang visualisasi, namun juga unjuk gigi keahlian *Da
 
 ---
 
-> 📌 **Kesimpulan Bab 5:**
-> EDA berhasil menjawab seluruh pertanyaan bisnis yang didefinisikan di Bab 1 dengan bukti visual dan statistik yang kuat. Temuan paling kritis adalah konfirmasi bahwa (1) pola disleksia terbukti nyata dan terukur secara piksel, (2) fitur XAI mampu memisahkan kelas secara organik, namun (3) dataset **belum layak** untuk pelatihan model karena *Class Imbalance* yang fatal. Temuan ketiga ini secara langsung memicu keputusan eksekusi untuk melakukan **Augmentasi Dataset menggunakan EMNIST** (Bab 6), yang harus divalidasi melalui A/B Testing sebelum data dinyatakan siap untuk *handover* ke AI Engineer.
+📌 **Kesimpulan Bab 5:** EDA berhasil menjawab seluruh pertanyaan bisnis yang didefinisikan di Bab 1 dengan bukti visual dan statistik yang kuat. Temuan paling kritis adalah konfirmasi bahwa (1) pola disleksia terbukti nyata dan terukur secara piksel, (2) fitur XAI mampu memisahkan kelas secara organik, namun (3) dataset belum layak untuk pelatihan model karena *Class Imbalance* yang fatal. Temuan ketiga ini secara langsung memicu keputusan eksekusi untuk melakukan augmentasi dataset menggunakan EMNIST (Bab 6), yang harus divalidasi melalui A/B Testing sebelum data dinyatakan siap untuk diserahterimakan (*handover*) ke AI Engineer.

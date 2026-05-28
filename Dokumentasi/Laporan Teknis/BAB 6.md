@@ -150,13 +150,4 @@ Plot KDE (*Kernel Density Estimation*) menampilkan overlay distribusi kedua data
 
 ## 6.3 Kesimpulan & Rekomendasi Lanjutan
 
-Eksperimen A/B Testing membuahkan kesimpulan solid:
-> 1. **Augmentasi spasial (rotasi/flip) dilarang keras** karena orientasi huruf adalah informasi klinis inti dalam diagnosis disleksia.
-> 2. **EMNIST dipilih** sebagai donor kelas Normal karena format identik (28×28 grayscale), konten relevan (tulisan tangan non-disleksia), dan skala yang memadai.
-> 3. **Mann-Whitney U Test** mendeteksi perbedaan statistik pada seluruh 6 fitur (p < 0.05), namun ini adalah konsekuensi alami dari *statistical power* tinggi pada N > 150.000.
-> 4. **Cohen's d** membuktikan bahwa seluruh perbedaan bersifat **Negligible** (|d| < 0.2) — secara praktis tidak bermakna.
-> 5. **Verdict Final: 6/6 fitur dinyatakan AMAN.** Injeksi EMNIST berhasil menyeimbangkan rasio kelas dari 3.35:1 menjadi 1.00:1 tanpa merusak "DNA" karakteristik tulisan tangan disleksia.
-
-> Dengan bukti saintifik ini, Dataset B (Gambo + EMNIST) secara resmi dinyatakan **layak** untuk di-*handover* ke tim AI Engineer. Proses penyiapan data final (*Stratified Splitting* dan *Data Dictionary*) akan didokumentasikan di **Bab 7**.
-**Keputusan Handover:** Dataset B secara resmi **LAYAK** diserahkan ke tim AI Engineer untuk proses pelatihan. 
-*(Catatan: Jika waktu pengembangan model memungkinkan, tim AI Engineer disarankan untuk melakukan uji McNemar Test kelak guna membandingkan performa akurasi akhir antara model yang dilatih pada Dataset A vs Dataset B).*
+📌 **Kesimpulan Bab 6:** Eksperimen A/B Testing membuahkan kesimpulan solid bahwa augmentasi spasial (seperti rotasi atau *flip*) dilarang keras karena orientasi huruf adalah informasi klinis inti dalam diagnosis disleksia. Sebagai gantinya, EMNIST dipilih sebagai donor kelas Normal karena memiliki format identik (28×28 *grayscale*), konten yang relevan, dan skala yang memadai. Walaupun *Mann-Whitney U Test* mendeteksi perbedaan statistik pada seluruh 6 fitur (p < 0.05) akibat tingginya *statistical power* (N > 150.000), evaluasi *Cohen's d* membuktikan bahwa seluruh perbedaan tersebut bersifat *Negligible* (|d| < 0.2) alias tidak bermakna secara praktis. Dengan keputusan final 6 dari 6 fitur dinyatakan aman, injeksi EMNIST sukses menyeimbangkan rasio kelas dari 3.35:1 menjadi ekuilibrium 1.00:1 tanpa merusak "DNA" asli karakteristik tulisan disleksia. Berbekal bukti saintifik ini, Dataset B (Gambo + EMNIST) diputuskan secara resmi layak untuk diserahkan ke tim AI Engineer. Proses penyiapan data final (*Stratified Splitting* dan *Data Dictionary*) akan didokumentasikan di Bab 7. Jika waktu pengembangan memungkinkan, tim AI Engineer disarankan untuk kelak melakukan uji *McNemar Test* guna membandingkan performa akurasi akhir antara model yang dilatih pada Dataset A versus Dataset B.

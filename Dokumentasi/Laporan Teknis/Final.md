@@ -113,10 +113,7 @@ Temuan ini membuktikan bahwa arsitektur folder fisik dataset Gambo sama sekali t
 ### D. Ketimpangan Distribusi (*Class Imbalance*)
 Berdasarkan hasil rekapitulasi distribusi awal, ditemukan fakta bahwa kelas disleksia (gabungan `Corrected` + `Reversal`) mendominasi populasi dataset secara tidak wajar dengan rasio mencapai **~3.35:1** terhadap kelas `Normal`. Ketimpangan kelas (*Class Imbalance*) separah ini adalah ancaman serius yang akan memicu bias mayoritas (*majority bias*) saat *training* model AI — model cenderung selalu menebak "Disleksia" karena itulah yang paling sering dilihatnya. Oleh karena itu, diperlukan strategi intervensi augmentasi untuk memulihkan ekuilibrium data.
 
-> 📌 **Kesimpulan Tahap Audit:** 
-> Walaupun Dataset Gambo memiliki spesifikasi teknis piksel yang mumpuni (28×28, grayscale, 100% `.png`), ia menyimpan kelemahan fatal pada arsitektur semantiknya (*Label Noise* dua arah, *Severity Score* kacau, dan *Class Imbalance* 3.35:1). 
-> 
-> **Implikasi Sistem (Action Item):** Fakta temuan ini *mengharamkan* AI Engineer untuk melatih model menggunakan metode pembacaan hirarki folder standar (seperti `ImageFolder` pada PyTorch/Keras). Mengandalkan folder fisik pasti akan berujung pada *Data Poisoning*. Sebagai gantinya, tahap pembersihan (Bab 3) wajib menghasilkan sebuah master dokumen CSV terpusat yang akan bertindak sebagai otoritas mutlak *ground truth* untuk melatih AI.
+📌 **Kesimpulan Tahap Audit:** Walaupun Dataset Gambo memiliki spesifikasi teknis piksel yang mumpuni (28×28, grayscale, 100% `.png`), ia menyimpan kelemahan fatal pada arsitektur semantiknya (*Label Noise* dua arah, *Severity Score* kacau, dan *Class Imbalance* 3.35:1). Fakta temuan ini secara mutlak mengharamkan AI Engineer untuk melatih model menggunakan metode pembacaan hirarki folder standar (seperti `ImageFolder` pada PyTorch/Keras), karena mengandalkan folder fisik pasti akan berujung pada *Data Poisoning*. Sebagai gantinya, tahap pembersihan (Bab 3) wajib menghasilkan sebuah master dokumen CSV terpusat yang akan bertindak sebagai otoritas mutlak *ground truth* untuk melatih AI.
 
 ---
 
@@ -232,10 +229,7 @@ Langkah B (penghapusan fisik gambar anomali putih) menyebabkan CSV memiliki **Gh
 > *Tempatkan screenshot log terminal yang menampilkan RINGKASAN KUANTITATIF (Berapa file terhapus oleh get_score, OS Validation, dan BERAPA TOTAL FILE BERSIH yang selamat).*
 > `![Ringkasan Kuantitatif Cleaning](path/ke/gambar3.png)`
 
-> 📌 **Kesimpulan Bab 3:**
-> Melalui *Logical Cleaning* berlapis yang disusul pembersihan *Inverted Background*, dataset Gambo telah direstorasi. Anomali *Label Noise* musnah, *Severity Score* tertata logis, dan *Ghost Records* berhasil ditumpas. Dokumen CSV akhir yang memuat kumpulan file selamat (*survived files*) ini resmi menjadi **satu-satunya sumber kebenaran (single source of truth)** untuk tahapan ekstraksi fitur (*Explainable AI*).
->
-> **Catatan Penangguhan Eksekusi:** Satu-satunya anomali audit (Bab 2) yang **sengaja belum diintervensi** pada tahap pembersihan ini adalah **Class Imbalance**. Isu ketimpangan distribusi tersebut ditangguhkan untuk dieksekusi secara khusus melalui strategi Augmentasi (Injeksi EMNIST) pasca tahap *Exploratory Data Analysis*, demi mencegah tercemarnya kemurnian data asli selama proses perancangan fitur XAI (Bab 4).
+📌 **Kesimpulan Bab 3:** Melalui *Logical Cleaning* berlapis yang disusul pembersihan *Inverted Background*, dataset Gambo telah direstorasi, di mana anomali *Label Noise* musnah, *Severity Score* tertata logis, dan *Ghost Records* berhasil ditumpas. Dokumen CSV akhir yang memuat kumpulan file selamat (*survived files*) ini resmi menjadi satu-satunya sumber kebenaran (*single source of truth*) untuk tahapan ekstraksi fitur (*Explainable AI*). Satu-satunya anomali audit (Bab 2) yang sengaja ditangguhkan penanganannya pada tahap ini adalah *Class Imbalance*. Isu ketimpangan distribusi tersebut akan dieksekusi secara khusus melalui strategi Augmentasi (Injeksi EMNIST) pasca tahap *Exploratory Data Analysis*, demi mencegah tercemarnya kemurnian data asli selama proses perancangan fitur XAI (Bab 4).
 
 ---
 
@@ -351,10 +345,7 @@ Fungsi ekstraksi diaplikasikan secara iteratif pada `master_dataset_dyslexia.csv
 | `stroke_transitions` | Float | Rata-rata transisi per baris (skala *IMG_SIZE*) |
 | `horizontal_symmetry` | Float | Skor kemiripan cermin spasial absolut (terkompresi > 0.8) |
 
-> 📌 **Kesimpulan Bab 4:**
-> Ekstraksi fitur matematis berhasil menerjemahkan kondisi motorik (tremor, asimetri spasial, keraguan/ *over-tracing*) ke dalam 6 metrik tabular. Dengan membedah secara jujur keterbatasan algoritmik dari formulanya (seperti *bias skala tremor* dan *kompresi rentang simetri*), fitur ini terbukti tetap memiliki variansi tinggi untuk membedakan kelas Normal dan Disleksia. 
-> 
-> Dataset yang telah diperkaya fitur tabular pendamping ini (*Featured Dataset*) membuka ruang bagi AI Engineer untuk merancang arsitektur **Late Fusion (Multi-Input Model)**. Di mana *Branch* 1 (CNN) menganalisis pola gambar mentah, dan *Branch* 2 (Dense Layer) menganalisis 6 fitur biologis ini, menciptakan AI yang tidak sekadar menebak, namun mampu menjelaskan alasannya secara klinis. Dataset ini juga kini siap untuk dianalisis lebih lanjut pada tahap *Exploratory Data Analysis* (Bab 5).
+📌 **Kesimpulan Bab 4:** Ekstraksi fitur matematis berhasil menerjemahkan kondisi motorik (tremor, asimetri spasial, keraguan/ *over-tracing*) ke dalam 6 metrik tabular. Dengan membedah secara jujur keterbatasan algoritmik dari formulanya (seperti bias skala tremor dan kompresi rentang simetri), fitur ini terbukti tetap memiliki variansi tinggi untuk membedakan kelas Normal dan Disleksia. Dataset yang telah diperkaya fitur tabular pendamping ini (*Featured Dataset*) membuka ruang bagi AI Engineer untuk merancang arsitektur *Late Fusion* (Multi-Input Model), di mana cabang pertama (CNN) menganalisis pola gambar mentah dan cabang kedua (Dense Layer) menganalisis 6 fitur biologis ini, menciptakan AI yang tidak sekadar menebak namun mampu menjelaskan alasannya secara klinis. Dataset ini kini siap untuk dianalisis lebih lanjut pada tahap *Exploratory Data Analysis* (Bab 5).
 
 ---
 
@@ -490,8 +481,7 @@ Aplikasi ini tidak hanya tentang visualisasi, namun juga unjuk gigi keahlian *Da
 
 ---
 
-> 📌 **Kesimpulan Bab 5:**
-> EDA berhasil menjawab seluruh pertanyaan bisnis yang didefinisikan di Bab 1 dengan bukti visual dan statistik yang kuat. Temuan paling kritis adalah konfirmasi bahwa (1) pola disleksia terbukti nyata dan terukur secara piksel, (2) fitur XAI mampu memisahkan kelas secara organik, namun (3) dataset **belum layak** untuk pelatihan model karena *Class Imbalance* yang fatal. Temuan ketiga ini secara langsung memicu keputusan eksekusi untuk melakukan **Augmentasi Dataset menggunakan EMNIST** (Bab 6), yang harus divalidasi melalui A/B Testing sebelum data dinyatakan siap untuk *handover* ke AI Engineer.
+📌 **Kesimpulan Bab 5:** EDA berhasil menjawab seluruh pertanyaan bisnis yang didefinisikan di Bab 1 dengan bukti visual dan statistik yang kuat. Temuan paling kritis adalah konfirmasi bahwa (1) pola disleksia terbukti nyata dan terukur secara piksel, (2) fitur XAI mampu memisahkan kelas secara organik, namun (3) dataset belum layak untuk pelatihan model karena *Class Imbalance* yang fatal. Temuan ketiga ini secara langsung memicu keputusan eksekusi untuk melakukan augmentasi dataset menggunakan EMNIST (Bab 6), yang harus divalidasi melalui A/B Testing sebelum data dinyatakan siap untuk diserahterimakan (*handover*) ke AI Engineer.
 
 ---
 
@@ -647,16 +637,7 @@ Plot KDE (*Kernel Density Estimation*) menampilkan overlay distribusi kedua data
 
 ## 6.3 Kesimpulan & Rekomendasi Lanjutan
 
-Eksperimen A/B Testing membuahkan kesimpulan solid:
-> 1. **Augmentasi spasial (rotasi/flip) dilarang keras** karena orientasi huruf adalah informasi klinis inti dalam diagnosis disleksia.
-> 2. **EMNIST dipilih** sebagai donor kelas Normal karena format identik (28×28 grayscale), konten relevan (tulisan tangan non-disleksia), dan skala yang memadai.
-> 3. **Mann-Whitney U Test** mendeteksi perbedaan statistik pada seluruh 6 fitur (p < 0.05), namun ini adalah konsekuensi alami dari *statistical power* tinggi pada N > 150.000.
-> 4. **Cohen's d** membuktikan bahwa seluruh perbedaan bersifat **Negligible** (|d| < 0.2) — secara praktis tidak bermakna.
-> 5. **Verdict Final: 6/6 fitur dinyatakan AMAN.** Injeksi EMNIST berhasil menyeimbangkan rasio kelas dari 3.35:1 menjadi 1.00:1 tanpa merusak "DNA" karakteristik tulisan tangan disleksia.
-
-> Dengan bukti saintifik ini, Dataset B (Gambo + EMNIST) secara resmi dinyatakan **layak** untuk di-*handover* ke tim AI Engineer. Proses penyiapan data final (*Stratified Splitting* dan *Data Dictionary*) akan didokumentasikan di **Bab 7**.
-**Keputusan Handover:** Dataset B secara resmi **LAYAK** diserahkan ke tim AI Engineer untuk proses pelatihan. 
-*(Catatan: Jika waktu pengembangan model memungkinkan, tim AI Engineer disarankan untuk melakukan uji McNemar Test kelak guna membandingkan performa akurasi akhir antara model yang dilatih pada Dataset A vs Dataset B).*
+📌 **Kesimpulan Bab 6:** Eksperimen A/B Testing membuahkan kesimpulan solid bahwa augmentasi spasial (seperti rotasi atau *flip*) dilarang keras karena orientasi huruf adalah informasi klinis inti dalam diagnosis disleksia. Sebagai gantinya, EMNIST dipilih sebagai donor kelas Normal karena memiliki format identik (28×28 *grayscale*), konten yang relevan, dan skala yang memadai. Walaupun *Mann-Whitney U Test* mendeteksi perbedaan statistik pada seluruh 6 fitur (p < 0.05) akibat tingginya *statistical power* (N > 150.000), evaluasi *Cohen's d* membuktikan bahwa seluruh perbedaan tersebut bersifat *Negligible* (|d| < 0.2) alias tidak bermakna secara praktis. Dengan keputusan final 6 dari 6 fitur dinyatakan aman, injeksi EMNIST sukses menyeimbangkan rasio kelas dari 3.35:1 menjadi ekuilibrium 1.00:1 tanpa merusak "DNA" asli karakteristik tulisan disleksia. Berbekal bukti saintifik ini, Dataset B (Gambo + EMNIST) diputuskan secara resmi layak untuk diserahkan ke tim AI Engineer. Proses penyiapan data final (*Stratified Splitting* dan *Data Dictionary*) akan didokumentasikan di Bab 7. Jika waktu pengembangan memungkinkan, tim AI Engineer disarankan untuk kelak melakukan uji *McNemar Test* guna membandingkan performa akurasi akhir antara model yang dilatih pada Dataset A versus Dataset B.
 
 ---
 
@@ -776,13 +757,7 @@ Berikut adalah spesifikasi formal (**kontrak data**) dari file output utama `mas
 
 ---
 
-> 📌 **Kesimpulan Bab 7:**
-> Dataset telah melewati seluruh gerbang kualitas:
-> - **Stratified Split** menjamin representasi proporsional setiap level keparahan di seluruh partisi.
-> - **Zero Data Leakage** dibuktikan secara algoritmik di level *filename*.
-> - **Data Dictionary** memberikan kontrak formal yang mengikat AI Engineer agar tidak menyalahgunakan kolom terlarang, menormalisasi fitur raw, atau melakukan augmentasi spasial yang merusak diagnosis.
->
-> Dengan ini, seluruh tanggung jawab **Data Scientist** dalam *pipeline* DyslexiaLens dinyatakan **selesai**. Estafet resmi diserahkan kepada tim **AI Engineer** untuk memulai proses arsitektur model dan pelatihan. Rangkuman final seluruh temuan dan rekomendasi strategis akan dipaparkan di **Bab 8 (Kesimpulan & Handover)**.
+📌 **Kesimpulan Bab 7:** Dataset akhirnya telah berhasil melewati seluruh gerbang kualitas secara paripurna. Melalui proses *Stratified Split*, representasi proporsional setiap level keparahan di seluruh partisi dapat dijamin, dan protokol *Zero Data Leakage* telah dibuktikan secara ketat secara algoritmik di level *filename*. Kehadiran *Data Dictionary* turut mengunci integritas ini dengan memberikan kontrak formal yang mengikat tim AI Engineer agar tidak menyalahgunakan kolom terlarang, sembarangan menormalisasi fitur *raw*, atau melakukan augmentasi spasial yang berpotensi merusak diagnosis. Dengan pencapaian ini, seluruh tanggung jawab tim Data Scientist dalam *pipeline* hulu DyslexiaLens secara resmi dinyatakan selesai. Tongkat estafet kini sepenuhnya diserahkan kepada tim AI Engineer untuk memulai perancangan arsitektur dan pelatihan model. Rangkuman final mengenai seluruh temuan dan rekomendasi strategis akan dipaparkan di Bab 8 (Kesimpulan & Handover).
 
 ---
 
