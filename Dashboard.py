@@ -47,7 +47,7 @@ st.markdown("""
     div[data-testid="stRadio"] > label { display: none !important; }
     div[data-testid="stRadio"] > div {
         gap: 0.4rem !important;
-        flex-wrap: nowrap;
+        flex-wrap: wrap !important;
         justify-content: flex-start;
     }
     div[data-testid="stRadio"] > div > label {
@@ -99,6 +99,13 @@ st.markdown("""
     /* Mobile: horizontal scroll */
     @media (max-width: 640px) {
         .site-navbar { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+        div[data-testid="stRadio"] > div {
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            scrollbar-width: none;
+            padding-bottom: 2px;
+        }
+        div[data-testid="stRadio"] > div::-webkit-scrollbar { display: none; }
         div[data-baseweb="tab-list"] {
             overflow-x: auto !important;
             flex-wrap: nowrap !important;
