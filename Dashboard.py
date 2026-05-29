@@ -5,44 +5,173 @@ import matplotlib.pyplot as plt
 import os
 
 # Konfigurasi Halaman (Harus dipanggil paling atas)
-st.set_page_config(page_title="DyslexiaLens - Data Viewer", page_icon="🧠", layout="wide")
+st.set_page_config(page_title="DyslexiaLens - Dashboard", page_icon="🧠", layout="wide")
 
 # CSS Styling
 st.markdown("""
 <style>
-    .main-header { font-size: 45px; font-weight: 800; color: var(--text-color); margin-bottom: -15px; }
-    .sub-header { font-size: 20px; color: var(--text-color); margin-bottom: 30px; border-bottom: 2px solid #3498DB; padding-bottom: 10px; opacity: 0.8;}
+    /* ── Typography ── */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif !important; }
+
+    /* ── Streamlit chrome ── */
+    header[data-testid="stHeader"] { background: transparent !important; }
+    section[data-testid="stSidebar"] { display: none !important; }
+    footer { visibility: hidden; }
+
+    /* ── Top navbar bar ── */
+    .site-navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 0 1rem 0;
+        border-bottom: 1px solid var(--secondary-background-color);
+        margin-bottom: 0;
+    }
+    .site-brand {
+        font-size: 1.35rem;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--text-color);
+        line-height: 1;
+    }
+    .site-brand span {
+        font-weight: 400;
+        opacity: 0.45;
+        font-size: 0.8rem;
+        margin-left: 0.6rem;
+        letter-spacing: 0;
+    }
+
+    /* ── Dataset radio as compact pill row ── */
+    div[data-testid="stRadio"] > label { display: none !important; }
+    div[data-testid="stRadio"] > div {
+        gap: 0.4rem !important;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+    }
+    div[data-testid="stRadio"] > div > label {
+        border: 1px solid var(--secondary-background-color) !important;
+        border-radius: 999px !important;
+        padding: 0.3rem 0.85rem !important;
+        font-size: 0.8rem !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        white-space: nowrap !important;
+    }
+    div[data-testid="stRadio"] > div > label:has(input:checked) {
+        background: var(--text-color) !important;
+        color: var(--background-color) !important;
+        border-color: var(--text-color) !important;
+    }
+
+    /* ── Tabs as secondary nav strip ── */
+    div[data-testid="stTabs"] {
+        position: sticky;
+        top: 0;
+        z-index: 999;
+        background: var(--background-color);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--secondary-background-color);
+        margin-top: 0;
+        margin-bottom: 1.5rem;
+    }
+    div[data-testid="stTabsTabPanel"] { padding-top: 0.5rem; }
+    button[data-baseweb="tab"] {
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 500 !important;
+        font-size: 0.85rem !important;
+        color: var(--text-color) !important;
+        opacity: 0.5;
+        background: transparent !important;
+        border: none !important;
+        padding: 0.75rem 1.1rem !important;
+        transition: opacity 0.2s ease !important;
+    }
+    button[data-baseweb="tab"]:hover { opacity: 1 !important; }
+    button[data-baseweb="tab"][aria-selected="true"] { opacity: 1 !important; }
+    div[data-baseweb="tab-highlight"] {
+        background-color: var(--text-color) !important;
+        height: 2px !important;
+        border-radius: 1px !important;
+    }
+    /* Mobile: horizontal scroll */
+    @media (max-width: 640px) {
+        .site-navbar { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+        div[data-baseweb="tab-list"] {
+            overflow-x: auto !important;
+            flex-wrap: nowrap !important;
+            scrollbar-width: none;
+        }
+        div[data-baseweb="tab-list"]::-webkit-scrollbar { display: none; }
+        button[data-baseweb="tab"] {
+            padding: 0.65rem 0.8rem !important;
+            font-size: 0.78rem !important;
+            white-space: nowrap !important;
+        }
+    }
+
+    /* ── Metric typography ── */
+    .metric-container { margin-bottom: 1.75rem; }
+    .metric-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-color);
+        opacity: 0.5;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        margin-bottom: 0.2rem;
+    }
+    .metric-value {
+        font-size: 2.25rem;
+        font-weight: 600;
+        color: var(--text-color);
+        letter-spacing: -0.02em;
+        line-height: 1;
+    }
+
+    /* ── Images ── */
+    .stImage > img {
+        border-radius: 6px;
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .stImage > img:hover { transform: scale(1.015); }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-header">🧠 DyslexiaLens Dataset Explorer</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Data Scientist Handover Dashboard — From Raw Data to Ready-to-Train CSV</div>', unsafe_allow_html=True)
-
-# Membuat Tab
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-    "📊 Dataset Summary", 
-    "👁️ Computer Vision (Pola Visual)", 
-    "🧠 XAI Profiling (Fitur Geometri)", 
-    "🛠 Stratification", 
-    "🔬 A/B Testing Validation",
-    "🔍 Interactive Viewer"
-])
-
 # ==========================================
-# SIDEBAR: PEMILIHAN DATASET
+# NAVBAR: Brand + Dataset Toggle
 # ==========================================
-st.sidebar.title("⚙️ Pengaturan Dataset")
-dataset_choice = st.sidebar.radio(
-    "Pilih Sumber Dataset:",
-    ["Dataset Tanpa Augmentasi (Original Gambo)", "Dataset Dengan Augmentasi (Gambo + EMNIST)"]
+st.markdown("""
+<div class="site-navbar">
+    <div class="site-brand">DyslexiaLens <span>Dashboard</span></div>
+</div>
+""", unsafe_allow_html=True)
+
+# Dataset pills — inline, right after navbar
+dataset_choice = st.radio(
+    "Dataset:",
+    ["Original (No Augmentation)", "Augmented (Gambo + EMNIST)"],
+    horizontal=True,
 )
 
-if dataset_choice == "Dataset Dengan Augmentasi (Gambo + EMNIST)":
-    csv_path = 'csv_metadata/Dataset_Dyslexia_EMNIST_FeatureEngineering.csv'
+if dataset_choice == "Augmented (Gambo + EMNIST)":
+    csv_path = 'Data/Dataset_Dyslexia_EMNIST_FeatureEngineering.csv'
 else:
-    csv_path = 'csv_metadata/Dataset_Dyslexia_NoAugmentation_FeatureEngineering.csv'
+    csv_path = 'Data/Dataset_Dyslexia_NoAugmentation_FeatureEngineering.csv'
 
-st.sidebar.info(f"**File Aktif:**\n`{csv_path}`")
+# ==========================================
+# TABS — secondary navigation
+# ==========================================
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    "Summary",
+    "Visual Analysis",
+    "XAI Profiling",
+    "Stratification",
+    "A/B Testing",
+    "Viewer",
+])
 
 # Load master dataset untuk Metrik dan EDA
 @st.cache_data
@@ -63,9 +192,9 @@ df_master = load_master_data(csv_path)
 # TAB 1: DATASET SUMMARY
 # ==========================================
 with tab1:
-    is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
+    is_noAugmentation = dataset_choice == "Original (No Augmentation)"
     title_suffix = "Original Gambo" if is_noAugmentation else "Gambo + EMNIST"
-    st.markdown(f"### 📊 Ringkasan Dataset Master ({title_suffix})")
+    st.markdown(f"### Ringkasan Dataset Master ({title_suffix})")
     if df_master is not None:
         col1, col2, col3, col4 = st.columns(4)
         total_images = len(df_master)
@@ -104,31 +233,31 @@ with tab1:
             st.dataframe(comparison_df.style.format("{:.2f}%"), width='stretch')
             st.info("💡 **Stratifikasi Berhasil!** Proporsi kelas Normal dan Dyslexia identik di set Train dan Test, mencegah adanya Domain Shift.")
     else:
-        st.error("csv_metadata/Dataset_Dyslexia_EMNIST.csv tidak ditemukan!")
+        st.error("Data/Dataset_Dyslexia_EMNIST.csv tidak ditemukan!")
 
 # ==========================================
 # TAB 2: COMPUTER VISION ANALYTICS
 # ==========================================
 with tab2:
-    st.markdown("### 👁️ Analisis Spasial & Piksel (Computer Vision)")
+    st.markdown("### Analisis Spasial & Piksel (Computer Vision)")
     
     # Path Dinamis berdasarkan pilihan sidebar
-    is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
+    is_noAugmentation = dataset_choice == "Original (No Augmentation)"
     img_folder = 'assets/noAugmentation' if is_noAugmentation else 'assets/EMNIST'
     img_suffix = '_noAugmentation.png' if is_noAugmentation else '_EMNIST.png'
     
-    st.markdown("#### 🖼️ Sampel Kelas: Normal vs Corrected vs Reversal")
+    st.markdown("#### Sampel Kelas: Normal vs Corrected vs Reversal")
     st.write("Wujud asli matriks 28x28 untuk membandingkan huruf solid, tarikan berulang (*Over-tracing*), dan pembalikan huruf (*Reversal*).")
     st.image(f'{img_folder}/class_samples{img_suffix}', width='stretch')
     st.divider()
 
-    st.markdown("#### 📈 Distribusi Keparahan (Severity Score)")
+    st.markdown("#### Distribusi Keparahan (Severity Score)")
     st.write("Melihat spektrum keparahan disleksia yang mendominasi dataset.")
     st.image(f'{img_folder}/severity_distribution{img_suffix}', width='stretch')
     st.divider()
     
     # === VARIANCE HEATMAP ===
-    st.markdown("#### 🔥 Variance Heatmap (Tremor vs Solid)")
+    st.markdown("#### Variance Heatmap (Tremor vs Solid)")
     st.write("Visualisasi variansi piksel untuk membuktikan bahwa penderita disleksia menghasilkan tulisan yang jauh lebih inkonsisten/bergetar (tremor) dibanding tulisan Normal.")
     
     st.info("#### 🤔 Pertanyaan Bisnis 2\n*Apakah pola visual tulisan tangan cukup kuat merepresentasikan kondisi kognitif disleksia, atau sekadar indikasi ambigu?*")
@@ -137,7 +266,7 @@ with tab2:
     st.divider()
 
     # === HEATMAP DIFFERENCE ===
-    st.markdown("#### 🔴 Rata-rata Piksel: Disleksia Ringan vs Parah")
+    st.markdown("#### Rata-rata Piksel: Disleksia Ringan vs Parah")
     st.write("Membedah titik buta (*blind spots*) spasial mana yang paling sering mengalami distorsi parah.")
     st.image(f'{img_folder}/heatmap{img_suffix}', width='stretch')
 
@@ -145,9 +274,9 @@ with tab2:
 # TAB 3: EXPLAINABLE AI (XAI) PROFILING
 # ==========================================
 with tab3:
-    st.markdown("### 🧠 Interpretasi Klinis Fitur Geometri (XAI)")
+    st.markdown("### Interpretasi Klinis Fitur Geometri (XAI)")
     
-    is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
+    is_noAugmentation = dataset_choice == "Original (No Augmentation)"
     img_folder = 'assets/noAugmentation' if is_noAugmentation else 'assets/EMNIST'
     img_suffix = '_noAugmentation.png' if is_noAugmentation else '_EMNIST.png'
     
@@ -168,9 +297,9 @@ with tab3:
 # TAB 4: DATA PREP & STRATIFICATION
 # ==========================================
 with tab4:
-    st.markdown("### ⚖️ Balancing & Kategori Data")
+    st.markdown("### Balancing & Kategori Data")
     
-    if dataset_choice == "Dataset Dengan Augmentasi (Gambo + EMNIST)":
+    if dataset_choice == "Augmented (Gambo + EMNIST)":
         st.write("Dataset Gambo asli memiliki ketidakseimbangan kelas (*Class Imbalance*) di mana tulisan Disleksia jauh lebih banyak dari tulisan Normal. Kami menyelesaikan ini dengan menambahkan EMNIST.")
         
         col1, col2 = st.columns(2)
@@ -205,7 +334,7 @@ with tab4:
             chart_title = 'Proporsi Kategori Folder (Normal / Corrected / Reversal)'
             
         if col_to_stack:
-            st.markdown(f"#### 🥧 {chart_title}")
+            st.markdown(f"#### {chart_title}")
             
             source_counts = df_master.groupby(['target_class', col_to_stack]).size().unstack(fill_value=0)
             source_counts.index = ['Normal (0)', 'Dyslexia (1)']
@@ -235,7 +364,7 @@ with tab4:
 # TAB 5: A/B TESTING VALIDATION
 # ==========================================
 with tab5:
-    st.markdown("### 🔬 Validasi Keamanan Augmentasi (A/B Testing)")
+    st.markdown("### Validasi Keamanan Augmentasi (A/B Testing)")
     st.write("Eksperimen A/B Testing ini membandingkan **Dataset A (Gambo Asli / Kurva Merah)** melawan **Dataset B (Gambo + EMNIST / Kurva Biru)**.")
     st.write("Visualisasi *Kernel Density Estimation* (KDE) di bawah ini membuktikan bahwa injeksi jutaan piksel dari EMNIST **tidak merusak** DNA atau distribusi fitur XAI asli dari dataset Gambo. Karena kedua kurva nyaris bertumpuk sempurna (*Negligible Effect Size* berdasarkan evaluasi Cohen's d), ini adalah bukti saintifik bahwa augmentasi EMNIST aman secara klinis.")
     st.info("💡 **Catatan:** Grafik validasi ini selalu menampilkan perbandingan antara ekosistem sebelum dan sesudah augmentasi, terlepas dari dataset apa yang sedang Anda tinjau di sidebar.")
@@ -245,10 +374,10 @@ with tab5:
 # TAB 6: DATASET VIEWER (COMPRESSED CSV)
 # ==========================================
 with tab6:
-    st.markdown("### 👁️ Eksplorasi Data (Compressed CSV)")
+    st.markdown("### Eksplorasi Data (Compressed CSV)")
 
-    is_noAugmentation = dataset_choice == "Dataset Tanpa Augmentasi (Original Gambo)"
-    csv_file = 'csv_metadata/dyslexialens_test_noAugmentation.csv.gz' if is_noAugmentation else 'csv_metadata/dyslexialens_test_EMNIST.csv.gz'
+    is_noAugmentation = dataset_choice == "Original (No Augmentation)"
+    csv_file = 'Data/dyslexialens_test_noAugmentation.csv.gz' if is_noAugmentation else 'Data/dyslexialens_test_EMNIST.csv.gz'
     df_pixels = load_compressed_csv(csv_file)
     
     file_size_mb = os.path.getsize(csv_file) / (1024 * 1024) if os.path.exists(csv_file) else 0
@@ -283,7 +412,7 @@ with tab6:
                         plt.close(fig)
                     
                 st.divider()
-                st.markdown("#### 📈 Analisis Piksel Interaktif")
+                st.markdown("#### Analisis Piksel Interaktif")
                 
                 n_samples = min(300, len(subset))
                 avg_sample = subset.sample(n_samples, random_state=42)
