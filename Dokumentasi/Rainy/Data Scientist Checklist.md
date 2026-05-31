@@ -1,7 +1,7 @@
 # Checklist Data Scientist — DyslexiaLens
 
 > Dokumen ini adalah operasionalisasi tugas Data Scientist dari **Project Plan** dan **List Tugas (Tech Stack)** Capstone DyslexiaLens.
-> Status diperbarui per Checkpoint 3 (19 April 2026).
+> Status diperbarui per Checkpoint 10 (31 Mei 2026).
 >
 > **Simbol:** `[x]` = Selesai | `[~]` = Sedang dikerjakan | `[ ]` = Belum dikerjakan
 
@@ -119,6 +119,8 @@
 - [x] `README.md` (root) — Dokumentasi repositori utama
 - [x] `Checkpoint1.md` — Rekam jejak progres Checkpoint 1
 - [x] `Checkpoint2.md` — Rekam jejak progres Checkpoint 2
+- [x] `Checkpoint9.md` — Rekam jejak progres Checkpoint 9 (Penyelesaian Dashboard & Notebook)
+- [x] `Checkpoint10.md` — Rekam jejak progres Checkpoint 10 (Validasi A/B Testing & SLA Handover)
 - [x] `DATA_SCIENTIST_CHECKLIST.md` — *(file ini sendiri, terus disinkronkan)*
 - [x] Dokumentasi hasil EDA dalam format Markdown dengan narasi lengkap
 
@@ -130,9 +132,9 @@
 
 - [x] **Feature Engineering (XAI)** — Menghasilkan 6 fitur turunan (ink_density, center_of_mass_x, center_of_mass_y, bounding_box_ratio, horizontal_symmetry, stroke_transitions) sebagai basis Explainable AI.
 - [x] **Deployment Dashboard Streamlit Cloud** — Dashboard berhasil dipublikasikan dan dapat diakses secara online. ✅ *Selesai 19 Mei 2026*
-- [ ] **A/B Testing** — Mengeksekusi pengujian A/B sesuai *Plan* baru: Opsi A (Uji Integritas Data via Mann-Whitney) secara mandiri, atau Opsi B (Uji Performa Model via McNemar) secara kolaboratif.
-- [ ] **Persiapan Sesi Mentoring Advisor** — Mengisi Dokumen Advisor Project Manager dan menyusun bahan presentasi (Dashboard & Temuan).
-- [ ] **Laporan Teknis Komprehensif (PDF)** — Menyusun Technical Report yang komprehensif berisi langkah analisis, evidence, citation, kesimpulan, dan rekomendasi action item.
+- [x] **A/B Testing** — Mengeksekusi pengujian A/B via Mann-Whitney U & Cohen's d, membuktikan secara saintifik bahwa augmentasi EMNIST aman secara klinis (|d| < 0.2).
+- [x] **Persiapan Sesi Mentoring Advisor** — Menyiapkan file revisi pertanyaan strategis dan skrip *Elevator Pitch* untuk dipresentasikan ke Advisor.
+- [x] **Laporan Teknis Komprehensif (PDF)** — Mengompilasi 8 Bab menjadi dokumen master *Single Source of Truth* (SLA Handover) setebal 51 halaman yang siap disidangkan.
 
 ---
 

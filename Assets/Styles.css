@@ -1,0 +1,251 @@
+/* Typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+html,
+body,
+[class*="css"] {
+    font-family: 'Inter', sans-serif !important;
+}
+
+/* Streamlit chrome */
+.block-container {
+    padding-top: 2rem !important;
+}
+
+header[data-testid="stHeader"] {
+    background: transparent !important;
+}
+
+section[data-testid="stSidebar"] {
+    display: none !important;
+}
+
+footer {
+    visibility: hidden;
+}
+
+/* Top navbar bar */
+.site-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0 1rem 0;
+    margin-bottom: 0.5rem;
+}
+
+.brand-wrapper {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+}
+
+.site-brand {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: #7ed6df;
+    text-shadow: 0 0 18px rgba(126, 214, 223, 0.15);
+    line-height: 1;
+}
+
+.site-subtitle {
+    font-weight: 500;
+    opacity: 0.5;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+/* Dataset radio as premium segmented pills */
+div.element-container:has(div[data-testid="stRadio"]),
+div.stElementContainer:has(div[data-testid="stRadio"]) {
+    display: flex !important;
+    justify-content: center !important;
+    width: 100% !important;
+}
+
+div[data-testid="stRadio"] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+div[data-testid="stRadio"]>label {
+    display: none !important;
+}
+
+div[data-testid="stRadio"]>div {
+    display: flex !important;
+    gap: 1rem !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    padding-bottom: 0.5rem !important;
+}
+
+div[data-testid="stRadio"]>div>label {
+    border: 1.5px solid rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.02) !important;
+    border-radius: 12px !important;
+    padding: 0.6rem 1.5rem !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    white-space: nowrap !important;
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Hide the built-in radio circle */
+div[data-testid="stRadio"]>div>label>div:first-child {
+    display: none !important;
+}
+
+div[data-testid="stRadio"]>div>label>div[data-testid="stMarkdownContainer"]>p {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+}
+
+div[data-testid="stRadio"]>div>label:hover {
+    background: rgba(255, 255, 255, 0.06) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    transform: translateY(-2px);
+}
+
+/* Selected state */
+div[data-testid="stRadio"]>div>label:has(input:checked) {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.15), rgba(155, 89, 182, 0.15)) !important;
+    color: #ffffff !important;
+    border-color: #9b59b6 !important;
+    box-shadow: 0 4px 15px rgba(155, 89, 182, 0.25) !important;
+    transform: translateY(-2px);
+}
+
+/* Tabs as premium pill nav */
+div[data-testid="stTabs"] {
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    background: var(--background-color);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    margin-top: -1rem;
+    margin-bottom: 2rem;
+    padding: 0.5rem 0;
+}
+
+div[data-testid="stTabsTabPanel"] {
+    padding-top: 0.5rem;
+}
+
+div[data-baseweb="tab-list"] {
+    justify-content: center !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-radius: 14px !important;
+    padding: 5px !important;
+    gap: 0.25rem !important;
+    width: fit-content !important;
+    margin: 0 auto !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+button[data-baseweb="tab"] {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    color: var(--text-color) !important;
+    opacity: 0.55;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.55rem 1.1rem !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    white-space: nowrap !important;
+}
+
+button[data-baseweb="tab"]:hover {
+    opacity: 1 !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+}
+
+button[data-baseweb="tab"][aria-selected="true"] {
+    opacity: 1 !important;
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.18), rgba(155, 89, 182, 0.18)) !important;
+    box-shadow: 0 2px 12px rgba(155, 89, 182, 0.2) !important;
+}
+
+div[data-baseweb="tab-highlight"] {
+    display: none !important;
+}
+
+div[data-baseweb="tab-border"] {
+    display: none !important;
+}
+
+/* Mobile: horizontal scroll */
+@media (max-width: 640px) {
+    .site-navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    div[data-testid="stRadio"]>div {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+    }
+
+    div[data-testid="stRadio"]>div::-webkit-scrollbar {
+        display: none;
+    }
+
+    div[data-baseweb="tab-list"] {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        scrollbar-width: none;
+    }
+
+    div[data-baseweb="tab-list"]::-webkit-scrollbar {
+        display: none;
+    }
+
+    button[data-baseweb="tab"] {
+        padding: 0.65rem 0.8rem !important;
+        font-size: 0.78rem !important;
+        white-space: nowrap !important;
+    }
+}
+
+/* Metric typography */
+.metric-container {
+    margin-bottom: 1.75rem;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-color);
+    opacity: 0.5;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 0.2rem;
+}
+
+.metric-value {
+    font-size: 2.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+/* Images */
+.stImage>img {
+    border-radius: 6px;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stImage>img:hover {
+    transform: scale(1.015);
+}

@@ -2,7 +2,9 @@
 
 > Bagian Data Science dari Capstone Project **DyslexiaLens**: Intelligent Handwriting Detection and Assistance for Dyslexia.
 >
-> Repositori ini berisi seluruh proses kerja Data Scientist, mulai dari eksplorasi dan audit dataset, pembersihan data (*Data Wrangling*), pemecahan masalah *Class Imbalance* menggunakan injeksi eksternal (**EMNIST**), validasi keamanan menggunakan uji statistik (**A/B Testing**), perumusan fitur *Explainable AI* (XAI), hingga pembuatan *Streamlit Executive Dashboard*.
+> Repositori ini berisi seluruh proses kerja Data Scientist: dari audit & *wrangling* dataset, pemecahan *Class Imbalance* via injeksi **EMNIST**, validasi keamanan melalui **A/B Testing** (Mann-Whitney & Cohen's d), perumusan 6 fitur **Explainable AI (XAI)**, hingga pembuatan *Streamlit Executive Dashboard* dan penyusunan **Laporan Teknis 51 Halaman** sebagai SLA Handover untuk tim AI Engineer.
+>
+> **🏁 Status: 100% COMPLETE — Fase Data Science resmi ditutup dan diserahterimakan.**
 
 ---
 
@@ -30,22 +32,23 @@ Pada repositori ini, fokus utama adalah membangun **Pondasi Data yang Kokoh** da
 Dataset Disleksia/
 │
 ├── 📊 app.py                       # Streamlit Executive Dashboard (UI/UX)
-├── 📁 assets/                      # Aset visual EDA untuk Streamlit & Laporan
+├── 📁 Assets/                      # Aset visual EDA untuk Streamlit & Laporan
 │   ├── EMNIST/                     # Grafik dataset augmentasi & A/B Testing
 │   └── noAugmentation/             # Grafik dataset murni
 │
-├── 📁 csv_metadata/                # Output tabular final (Siap Training!)
+├── 📁 Data/                                 # Output tabular final (Siap Training!)
 │   ├── Dataset_Dyslexia_EMNIST_FeatureEngineering.csv
 │   └── dyslexialens_test_EMNIST.csv.gz (Compressed Pixel Viewer)
 │
-├── 📁 notebooks/
-│   ├── 📓 AB_Testing.ipynb         # Notebook validasi A/B Testing
-│   ├── 📓 Dyslexia_EMNIST.ipynb    # Notebook utama pipeline EMNIST
-│   ├── 📓 Dyslexia_NoAugment.ipynb # Notebook utama pipeline murni
-│   ├── 📓 EMNIST_to_Gambo.ipynb    # Notebook penggabungan dataset EMNIST dan Gambo
+├── 📁 Notebooks/
+│   ├── 📓 AB_Testing.ipynb                    # Notebook validasi A/B Testing (Mann-Whitney & Cohen's d)
+│   ├── 📓 Dyslexia_EMNIST.ipynb               # Notebook utama pipeline EMNIST
+│   ├── 📓 Dyslexia_NoAugment.ipynb            # Notebook utama pipeline murni
+│   ├── 📓 EMNIST_to_Gambo.ipynb               # Notebook penggabungan dataset EMNIST dan Gambo
 │
-├── 📁 Dokumentasi/Laporan Teknis/  # 🌟 SINGLE SOURCE OF TRUTH DOKUMENTASI
-│   └── 📑 Final.md                 # Gabungan utuh BAB 1 - BAB 8 (SLA Kontrak)
+├── 📁 Dokumentasi/Laporan Teknis/             # 🌟 SINGLE SOURCE OF TRUTH DOKUMENTASI
+│   ├── 📑 Final.md                            # Gabungan utuh BAB 1 - BAB 8 (SLA Kontrak, versi Markdown)
+│   └── 📑 Laporan Teknis Komprehensif Final.pdf  # Versi PDF siap sidang (51 Halaman)
 ```
 
 ---
@@ -74,9 +77,9 @@ Membuktikan secara empiris (menggunakan *Variance Heatmap* dan *KDE Plot*) bahwa
 
 ### Bab 6 — Strategi Augmentasi & A/B Testing
 Augmentasi spasial (seperti rotasi dan flip) **diharamkan** karena mengubah orientasi adalah gejala penyakit itu sendiri (huruf 'b' dirotasi jadi 'p').
-* **Solusi:** Injeksi data **EMNIST** dikombinasi algoritma *Fair Pruning* untuk mendowngrade mayoritas.
-* **Hasil:** Ekuilibrium rasio **1.00:1** (~102.394 Disleksia vs ~102.439 Normal).
-* **Validasi (A/B Testing):** Uji statistik *Mann-Whitney U* dan evaluasi *Cohen's d* membuktikan efek injeksi EMNIST bersifat *Negligible* (|d| < 0.2), menjamin DNA Gambo tidak rusak.
+* **Solusi:** Injeksi data **EMNIST** dikombinasi algoritma *Fair Pruning* untuk men-*downgrade* mayoritas.
+* **Hasil:** Ekuilibrium rasio **1.00:1** (~102.394 Disleksia vs ~102.439 Normal) dari sebelumnya 3.35:1.
+* **Validasi (A/B Testing):** Walaupun *Mann-Whitney U Test* mendeteksi perbedaan statistik (akibat *Large N Effect* pada >150k sampel), evaluasi **Cohen's d** membuktikan seluruh 6 fitur memiliki |d| < 0.2 (*Negligible*). Ini membuktikan injeksi EMNIST aman secara klinis dan tidak merusak "DNA" asli tulisan disleksia. Hasil ini divisualisasikan melalui *KDE Overlay* di **Tab 5 Dashboard**.
 
 ### Bab 7 & 8 — Penyiapan Data & Action Items
 * Melakukan **Stratified Splitting (70/15/15)**.
@@ -104,27 +107,28 @@ streamlit run app.py
 - [x] Feature Engineering **6 Fitur** Matematis Geometri XAI (Bab 4)
 - [x] Computer Vision Analytics (Variance & Difference Heatmaps) (Bab 5)
 - [x] Injeksi EMNIST & Algoritma Fair Pruning untuk Balancing (Bab 6)
-- [x] Validasi Keamanan Augmentasi via **A/B Testing** KDE Overlay (Bab 6)
+- [x] Validasi Keamanan Augmentasi via **A/B Testing** (Mann-Whitney U & Cohen's d) (Bab 6)
 - [x] Stratified Split (70/15/15) bebas Data Leakage (Bab 7)
 - [x] Ekspor *Compressed Pixel CSV* (`.csv.gz`) untuk memori dashboard efisien
-- [x] Pembuatan Executive Dashboard interaktif dengan Streamlit (Tab 1-5)
-- [x] Standardisasi Dokumentasi MLOps (*Final.md*) (Bab 8)
+- [x] Pembuatan Executive Dashboard interaktif dengan Streamlit (Tab 1-6 termasuk Tab A/B Testing)
+- [x] Standardisasi Dokumentasi MLOps & SLA Kontrak (*Final.md*) (Bab 8)
+- [x] Penyusunan Laporan Teknis Komprehensif PDF siap sidang (51 Halaman)
 
-**Status: 100% COMPLETE. SLA KONTRAK DATA RESMI DISERAHKAN KE TIM AI ENGINEER.**
+**🏁 Status: 100% COMPLETE — SLA KONTRAK DATA RESMI DISERAHKAN KE TIM AI ENGINEER.**
 
 ---
 
 ## 👤 Kontributor
 
-| Nama | Role | Fokus |
+| Nama | Role | Fokus Utama |
 |---|---|---|
-| Rainy | Data Scientist | Dataset Auditing, Data Wrangling, Stratified Splitting, XAI Feature Engineering, & Dashboarding Streamlit |
-| w0pal | Data Scientist | EMNIST-GAMBO Integration (Balancing), Metadata Construction, & Pipeline Automation |
+| Rainy | Data Scientist | Dataset Auditing, Logical Cleaning, Stratified Splitting, XAI Feature Engineering, A/B Testing & Dashboarding Streamlit |
+| w0pal | Data Scientist | EMNIST-GAMBO Integration (Fair Pruning Balancing), Metadata Construction, & Pipeline Automation |
 
 ---
 
 ## 📄 Lisensi & Referensi Dataset
-*   Dataset **Gambo**: Publik (https://www.kaggle.com/datasets/drizasazanitaisa/dyslexia-handwriting-dataset)
-*   Dataset **EMNIST**: Publik (https://www.kaggle.com/datasets/crawford/emnist)
+* Dataset **Gambo**: Publik — [Kaggle: Dyslexia Handwriting Dataset](https://www.kaggle.com/datasets/drizasazanitaisa/dyslexia-handwriting-dataset)
+* Dataset **EMNIST**: Publik — [Kaggle: EMNIST](https://www.kaggle.com/datasets/crawford/emnist)
 
 *(Hak cipta dan kredit penelitian asli tetap mengacu pada author paper Gambo dan EMNIST).*
