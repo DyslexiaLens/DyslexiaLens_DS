@@ -38,7 +38,7 @@ Dataset Disleksia/
 │
 ├── 📁 Data/                                 # Output tabular final (Siap Training!)
 │   ├── Dataset_Dyslexia_EMNIST_FeatureEngineering.csv
-│   └── dyslexialens_test_EMNIST.csv.gz (Compressed Pixel Viewer)
+│   └── Testset_Dyslexia_EMNIST.csv.gz (Compressed Pixel Viewer)
 │
 ├── 📁 Notebooks/
 │   ├── 📓 AB_Testing.ipynb                    # Notebook validasi A/B Testing (Mann-Whitney & Cohen's d)
@@ -47,7 +47,6 @@ Dataset Disleksia/
 │   ├── 📓 EMNIST_to_Gambo.ipynb               # Notebook penggabungan dataset EMNIST dan Gambo
 │
 ├── 📁 Dokumentasi/Laporan Teknis/             # 🌟 SINGLE SOURCE OF TRUTH DOKUMENTASI
-│   ├── 📑 Final.md                            # Gabungan utuh BAB 1 - BAB 8 (SLA Kontrak, versi Markdown)
 │   └── 📑 Laporan Teknis Komprehensif Final.pdf  # Versi PDF siap sidang (51 Halaman)
 ```
 
@@ -123,7 +122,7 @@ streamlit run app.py
 | Nama | Role | Fokus Utama |
 |---|---|---|
 | Rainy | Data Scientist | Dataset Auditing, Logical Cleaning, Stratified Splitting, XAI Feature Engineering, A/B Testing & Dashboarding Streamlit |
-| w0pal | Data Scientist | EMNIST-GAMBO Integration (Fair Pruning Balancing), Metadata Construction, & Pipeline Automation |
+| w0pal | Data Scientist | EMNIST-GAMBO Integration (Fair Pruning Balancing), Metadata Construction, Pipeline Automation, & Dashboarding Streamlit |
 
 ---
 

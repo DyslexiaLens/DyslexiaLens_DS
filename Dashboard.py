@@ -15,14 +15,14 @@ DATASET_OPTIONS = {
         "csv_path": "Data/Dataset_Dyslexia_NoAugmentation_FeatureEngineering.csv",
         "image_folder": "Assets/noAugmentation",
         "image_suffix": "_noAugmentation.png",
-        "test_csv": "Data/dyslexialens_test_noAugmentation.csv.gz",
+        "test_csv": "Data/Testset_Dyslexia_EMNIST.csv.gz",
     },
     "Augmented (Gambo + EMNIST)": {
         "title_suffix": "Gambo + EMNIST",
         "csv_path": "Data/Dataset_Dyslexia_EMNIST_FeatureEngineering.csv",
         "image_folder": "Assets/EMNIST",
         "image_suffix": "_EMNIST.png",
-        "test_csv": "Data/dyslexialens_test_EMNIST.csv.gz",
+        "test_csv": "Data/Testset_Dyslexia_NoAugmentation.csv.gz",
     },
 }
 
