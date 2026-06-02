@@ -21,8 +21,8 @@ Pada repositori ini, fokus utama adalah membangun **Pondasi Data yang Kokoh** da
 | **Dataset Primer** | Gambo (Handwriting Dyslexia Dataset) |
 | **Dataset Sekunder** | EMNIST (Digunakan untuk injeksi ekuilibrium kelas Normal) |
 | **Total Sampel (Balanced)** | ~204.833 gambar (Rasio 1:1 Normal vs Disleksia) |
-| **Aplikasi Presentasi** | Streamlit Interactive Dashboard (`app.py`) |
-| **Dokumentasi Final** | Laporan Teknis/Final.md (SLA Handover to AI Engineer) |
+| **Aplikasi Presentasi** | Streamlit Interactive Dashboard (`Dashboard.py`) |
+| **Dokumentasi Final** | Laporan Teknis/Laporan Teknis Komprehensif Final.md |
 
 ---
 
@@ -31,30 +31,36 @@ Pada repositori ini, fokus utama adalah membangun **Pondasi Data yang Kokoh** da
 ```text
 Dataset Disleksia/
 │
-├── 📊 app.py                       # Streamlit Executive Dashboard (UI/UX)
+├── 📊 Dashboard.py                 # Streamlit Executive Dashboard (UI/UX)
 ├── 📁 Assets/                      # Aset visual EDA untuk Streamlit & Laporan
 │   ├── EMNIST/                     # Grafik dataset augmentasi & A/B Testing
 │   └── noAugmentation/             # Grafik dataset murni
 │
-├── 📁 Data/                                 # Output tabular final (Siap Training!)
+├── 📁 Data/                        # Output tabular final (Siap Training!)
+│   ├── Dataset_Dyslexia_NoAugmentation_FeatureEngineering.csv
 │   ├── Dataset_Dyslexia_EMNIST_FeatureEngineering.csv
-│   └── Testset_Dyslexia_EMNIST.csv.gz (Compressed Pixel Viewer)
+│   ├── TestSet_PixelMatrix_GamboOnly.csv.gz
+│   └── TestSet_PixelMatrix_Gambo_EMNIST.csv.gz
+│
+├── 📁 Laporan Teknis/              # 🌟 Wajah Proyek (SLA & Dokumen Final)
+│   └── 📑 Laporan Teknis Komprehensif.pdf
+│
+├── 📁 Dokumentasi/                 # Log & Konteks Handover Tim
+│   ├── 📁 Rainy/                   # Data Scientist Checklist & Checkpoint Sesi
+│   └── 📁 w0pal/                   # Dokumen Handover Data Scientist
 │
 ├── 📁 Notebooks/
-│   ├── 📓 AB_Testing.ipynb                    # Notebook validasi A/B Testing (Mann-Whitney & Cohen's d)
-│   ├── 📓 Dyslexia_EMNIST.ipynb               # Notebook utama pipeline EMNIST
-│   ├── 📓 Dyslexia_NoAugment.ipynb            # Notebook utama pipeline murni
-│   ├── 📓 EMNIST_to_Gambo.ipynb               # Notebook penggabungan dataset EMNIST dan Gambo
-│
-├── 📁 Dokumentasi/Laporan Teknis/             # 🌟 SINGLE SOURCE OF TRUTH DOKUMENTASI
-│   └── 📑 Laporan Teknis Komprehensif Final.pdf  # Versi PDF siap sidang (51 Halaman)
+│   ├── 📓 AB_Testing.ipynb         # Validasi A/B Testing (Mann-Whitney & Cohen's d)
+│   ├── 📓 Dyslexia_EMNIST.ipynb    # Pipeline EMNIST
+│   ├── 📓 Dyslexia_NoAugment.ipynb # Pipeline murni
+│   └── 📓 EMNIST_to_Gambo.ipynb    # Penggabungan EMNIST dan Gambo
 ```
 
 ---
 
 ## 🔬 Alur Kerja Data Science (Berdasarkan Laporan Teknis)
 
-Seluruh pengerjaan pada repositori ini terdokumentasi rapi di dalam file **`Dokumentasi/Laporan Teknis/Final.md`** yang memuat 8 Bab utama:
+Seluruh pengerjaan pada repositori ini terdokumentasi rapi di dalam file **`Laporan Teknis/Laporan Teknis Komprehensif Final.md`** yang memuat 8 Bab utama:
 
 ### Bab 2 & 3 — Audit & Logical Cleaning
 Ditemukan 3 anomali kritis pada dataset publik Gambo:
