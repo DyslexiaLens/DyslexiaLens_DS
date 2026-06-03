@@ -28,5 +28,10 @@ reports/
 .DS_Store
 prompt/
 
-notebooks/MD
-Dokumentasi/Referensi/A B Testing
+Notebooks/MD
+# Sembunyikan semua file di folder Referensi
+Dokumentasi/Referensi/
+
+# Sembunyikan semua folder Scrap tempat pembuangan draf usang
+Dokumentasi/Rainy/Scrap/
+Dokumentasi/w0pal/Scrap/
