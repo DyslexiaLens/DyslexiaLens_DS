@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="Assets/Logo DyslexiaLens.png" alt="DyslexiaLens Logo" width="120"/>
+  <img src="Assets/Logo Cropped.png" alt="DyslexiaLens Logo" width="120"/>
 
   # 🧠 DyslexiaLens Data Science & XAI Repository
 
