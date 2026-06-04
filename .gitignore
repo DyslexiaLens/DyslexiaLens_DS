@@ -1,37 +1,20 @@
-# Python & Environments
+# Python
 __pycache__/
-*.pyc
-.venv/
-env/
-*env
-master_dataset_final.csv
 
-# Dataset Folders (Huge Physical Files)
+# Dataset (ukuran besar)
 Dataset/
-Dataset_Ready/
 EMNIST_Processed/
 Gambo*/
 archive/
 processed/
 raw/
-reports/
 
-# Compressed Files & Artifacts (Upload these to GitHub Releases!)
+# Arsip & Artifact
 *.zip
 *.rar
 *.7z
-# Ignore all .gz files EXCEPT the test dataset for Streamlit
 
-# IDE & OS Files
+# IDE & Operating System
 .vscode/
 .idea/
 .DS_Store
-prompt/
-
-Notebooks/MD
-# Sembunyikan semua file di folder Referensi
-Dokumentasi/Referensi/
-
-# Sembunyikan semua folder Scrap tempat pembuangan draf usang
-Dokumentasi/Rainy/Scrap/
-Dokumentasi/w0pal/Scrap/

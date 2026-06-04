@@ -1,10 +1,20 @@
-# 🧠 DyslexiaLens — Data Science & XAI Repository
+<div align="center">
+  <img src="Assets/Logo DyslexiaLens.png" alt="DyslexiaLens Logo" width="120"/>
+
+  # 🧠 DyslexiaLens Data Science & XAI Repository
+
+  [![Python](https://img.shields.io/badge/python-3.10+-blue.svg?logo=python)](https://www.python.org/)
+  [![Streamlit](https://img.shields.io/badge/streamlit-1.45+-FF4B4B.svg?logo=streamlit&logoColor=white)](https://streamlit.io/)
+  [![Pandas](https://img.shields.io/badge/pandas-2.0+-150458.svg?logo=pandas&logoColor=white)](https://pandas.pydata.org/)
+  [![NumPy](https://img.shields.io/badge/numpy-1.24+-013243.svg?logo=numpy&logoColor=white)](https://numpy.org/)
+  [![SciPy](https://img.shields.io/badge/scipy-1.10+-0C55A5.svg?logo=scipy&logoColor=white)](https://scipy.org/)
+</div>
 
 > Bagian Data Science dari Capstone Project **DyslexiaLens**: Intelligent Handwriting Detection and Assistance for Dyslexia.
 >
 > Repositori ini berisi seluruh proses kerja Data Scientist: dari audit & *wrangling* dataset, pemecahan *Class Imbalance* via injeksi **EMNIST**, validasi keamanan melalui **A/B Testing** (Mann-Whitney & Cohen's d), perumusan 6 fitur **Explainable AI (XAI)**, hingga pembuatan *Streamlit Executive Dashboard* dan penyusunan **Laporan Teknis 51 Halaman** sebagai SLA Handover untuk tim AI Engineer.
 >
-> **🏁 Status: 100% COMPLETE — Fase Data Science resmi ditutup dan diserahterimakan.**
+> **🏁 Status: 100% COMPLETE! Fase Data Science resmi ditutup dan diserahterimakan.**
 
 ---
 
@@ -111,13 +121,13 @@ streamlit run Dashboard.py
 
 Seluruh pengerjaan pada repositori ini terdokumentasi rapi di dalam file **`Laporan Teknis/Laporan Teknis Komprehensif Final.md`** yang memuat 8 Bab utama:
 
-### Bab 2 & 3 — Audit & Logical Cleaning
+### Bab 2 & 3: Audit & Logical Cleaning
 Ditemukan 3 anomali kritis pada dataset publik Gambo:
 1. **Class Imbalance:** Rasio 3.35:1 (Disleksia sangat mendominasi).
 2. **Label Noise:** Ratusan data Normal tersesat di folder Disleksia (dan sebaliknya) yang dibersihkan via Pandas.
 3. **Sistem Severity Score Cacat:** Skala asli (9=Ringan, 1=Parah) dibalik, dan skor ekstrem (4 dan 1) digabungkan menjadi skor **6 (Paling Parah)** guna menjaga kontinuitas Ordinal (0=Normal, 1-6=Ringan-Parah).
 
-### Bab 4 — Feature Engineering (Membangun 6 Fitur XAI)
+### Bab 4:  Feature Engineering (Membangun 6 Fitur XAI)
 Untuk memastikan arsitektur *Late Fusion CNN* kelak memiliki kemampuan **Explainable AI (XAI)**, kami mengekstrak 6 fitur matematis secara *stateless* (per gambar) agar terhindar dari *Data Leakage*:
 1. `stroke_density`: Mendeteksi *Over-tracing* (coretan ragu-ragu/berulang).
 2. `center_of_mass_x`: Distorsi spasial horizontal.
@@ -126,16 +136,16 @@ Untuk memastikan arsitektur *Late Fusion CNN* kelak memiliki kemampuan **Explain
 5. `stroke_transitions`: Menghitung frekuensi getaran (*tremor*) berupa garis bergerigi.
 6. `horizontal_symmetry`: Indikator klinis terkuat untuk disleksia orientasi (*Reversal/Mirroring*).
 
-### Bab 5 — EDA & Dashboarding
+### Bab 5: EDA & Dashboarding
 Membuktikan secara empiris (menggunakan *Variance Heatmap* dan *KDE Plot*) bahwa pola visual disleksia benar-benar nyata (inkonsistensi spasial tinggi) dan mampu membedakan sub-tipe disleksia (Corrected vs Reversal). Di-deploy dalam bentuk Streamlit.
 
-### Bab 6 — Strategi Augmentasi & A/B Testing
+### Bab 6: Strategi Augmentasi & A/B Testing
 Augmentasi spasial (seperti rotasi dan flip) **diharamkan** karena mengubah orientasi adalah gejala penyakit itu sendiri (huruf 'b' dirotasi jadi 'p').
 * **Solusi:** Injeksi data **EMNIST** dikombinasi algoritma *Fair Pruning* untuk men-*downgrade* mayoritas.
 * **Hasil:** Ekuilibrium rasio **1.00:1** (~102.394 Disleksia vs ~102.439 Normal) dari sebelumnya 3.35:1.
 * **Validasi (A/B Testing):** Walaupun *Mann-Whitney U Test* mendeteksi perbedaan statistik (akibat *Large N Effect* pada >150k sampel), evaluasi **Cohen's d** membuktikan seluruh 6 fitur memiliki |d| < 0.2 (*Negligible*). Ini membuktikan injeksi EMNIST aman secara klinis dan tidak merusak "DNA" asli tulisan disleksia. Hasil ini divisualisasikan melalui *KDE Overlay* di **Tab 5 Dashboard**.
 
-### Bab 7 & 8 — Penyiapan Data & Action Items
+### Bab 7 & 8: Penyiapan Data & Action Items
 * Melakukan **Stratified Splitting (70/15/15)**.
 * Membangun **Data Dictionary**.
 * Merumuskan 3 Aturan Mutlak (*MUST NOT*) untuk AI Engineer (misal: dilarang menggunakan *MSE Loss* untuk memprediksi Severity Score karena sifatnya *Ordinal*).
@@ -156,7 +166,7 @@ Augmentasi spasial (seperti rotasi dan flip) **diharamkan** karena mengubah orie
 - [x] Standardisasi Dokumentasi MLOps & SLA Kontrak (Bab 8)
 - [x] Penyusunan Laporan Teknis Komprehensif PDF siap sidang (51 Halaman)
 
-**🏁 Status: 100% COMPLETE — SLA KONTRAK DATA RESMI DISERAHKAN KE TIM AI ENGINEER.**
+**🏁 Status: 100% COMPLETE! SLA KONTRAK DATA RESMI DISERAHKAN KE TIM AI ENGINEER.**
 
 ---
 
@@ -174,12 +184,14 @@ Augmentasi spasial (seperti rotasi dan flip) **diharamkan** karena mengubah orie
 Sesuai dengan lisensi publikasi dataset asli, penggunaan data pada proyek ini memberikan kredit penuh kepada para peneliti berikut:
 
 **Dataset Gambo (Dyslexia Handwriting Dataset):**
+* 🔗 **Sumber:** [Kaggle: Dyslexia Handwriting Dataset](https://www.kaggle.com/datasets/drizasazanitaisa/dyslexia-handwriting-dataset)
 1. M. S. A. B. Rosli, I. S. Isa, S. A. Ramlan, S. N. Sulaiman and M. I. F. Maruzuki, *"Development of CNN Transfer Learning for Dyslexia Handwriting Recognition,"* 2021 11th IEEE International Conference on Control System, Computing and Engineering (ICCSCE), 2021, pp. 194-199, doi: 10.1109/ICCSCE52189.2021.9530971.
 2. N. S. L. Seman, I. S. Isa, S. A. Ramlan, W. Li-Chih and M. I. F. Maruzuki, *"Notice of Removal: Classification of Handwriting Impairment Using CNN for Potential Dyslexia Symptom,"* 2021 11th IEEE International Conference on Control System, Computing and Engineering (ICCSCE), 2021, pp. 188-193, doi: 10.1109/ICCSCE52189.2021.9530989.
 3. Isa, Iza Sazanita. *"CNN Comparisons Models On Dyslexia Handwriting Classification / Iza Sazanita Isa … [et Al.]."* Universiti Teknologi MARA Cawangan Pulau Pinang, 2021.
 4. Isa, I. S., Rahimi, W. N. S., Ramlan, S. A., & Sulaiman, S. N. (2019). *"Automated detection of dyslexia symptom based on handwriting image for primary school children."* Procedia Computer Science, 163, 440-449.
 
 **Dataset EMNIST:**
-5. Cohen, G., Afshar, S., Tapson, J., & van Schaik, A. (2017). *"EMNIST: an extension of MNIST to handwritten letters."* Retrieved from http://arxiv.org/abs/1702.05373
+* 🔗 **Sumber:** [Kaggle: EMNIST](https://www.kaggle.com/datasets/crawford/emnist)
+1. Cohen, G., Afshar, S., Tapson, J., & van Schaik, A. (2017). *"EMNIST: an extension of MNIST to handwritten letters."* Retrieved from http://arxiv.org/abs/1702.05373
 
 *(Repositori ini adalah implementasi akademik turunan (Capstone Project) dan bukan pemilik properti intelektual dari dataset raw di atas).*
